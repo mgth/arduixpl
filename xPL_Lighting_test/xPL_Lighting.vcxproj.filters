@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers sources\lighting">
+      <UniqueIdentifier>{a031b154-bf3c-4bed-9828-d02beae552b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="functions order.txt" />
+    <None Include="xPL_Lighting_test.ino" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\xPL.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_stringlist.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_adapter.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_adapterethernet.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_bufferfiller.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_config.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_debug.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingnode.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingoutputmapper.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingscene.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingscenemember.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_main.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_message.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_node.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schema.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemaconfig.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemafilter.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemagroup.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemahbeat.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemalighting.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaControl.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Event.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_eeprom.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Numeric.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_String.h.test">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_string.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingtypes.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_ethercard\xpl_adapterenc28j60.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\xpl_lighting.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingchannel.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingdevice.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightinggateway.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingmessage.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingnetwork.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingnode.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingoutputmapper.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingscene.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingscenemember.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Visual Micro\.xPL_Lighting.vsarduino.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Visual Micro\.xPL_Lighting_test.vsarduino.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_group\xpl_group.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_filter\xpl_filter.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xpl_adapterethernet.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_BufferFiller.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Debug.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingOutputMapper.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingScene.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingSceneMember.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingTypes.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Main.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Message.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Node.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Schema.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaConfig.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaControl.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaFilter.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaGroup.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaHbeat.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaLighting.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaSensor.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Event.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Eeprom.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xpl_string.cpp.test">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xpl_string.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Adapter.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_AdapterENC28J60.cpp.old">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingChannel.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingDevice.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingGateway.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingMessage.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingNetwork.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingNode.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingOutputMapper.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingScene.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingSceneMember.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingTypes.cpp">
+      <Filter>Fichiers sources\lighting</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

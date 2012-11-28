@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B26962FC-86D8-4837-B8A8-791C33860279}</ProjectGuid>
+    <RootNamespace>xPL_Lighting</RootNamespace>
+    <ProjectName>xPL_Lighting_test</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>F:\DropBox\Dropbox\arduino-1.0.1\hardware\arduino\cores\arduino;F:\DropBox\Dropbox\arduino-1.0.1\hardware\arduino\variants\mega;F:\DropBox\Dropbox\arduino-1.0.1\libraries\EtherCard;F:\DropBox\Dropbox\arduino-1.0.1\libraries\EtherCard\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\SPI;F:\DropBox\Dropbox\arduino-1.0.1\libraries\SPI\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\Ethernet;F:\DropBox\Dropbox\arduino-1.0.1\libraries\Ethernet\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL\utility;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\include\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\include\avr\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\lib\gcc\avr\4.3.2\include\;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>F:\DropBox\Dropbox\arduino-1.0.1\hardware\arduino\cores\arduino;F:\DropBox\Dropbox\arduino-1.0.1\hardware\arduino\variants\mega;F:\DropBox\Dropbox\arduino-1.0.1\libraries\EtherCard;F:\DropBox\Dropbox\arduino-1.0.1\libraries\EtherCard\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\SPI;F:\DropBox\Dropbox\arduino-1.0.1\libraries\SPI\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\Ethernet;F:\DropBox\Dropbox\arduino-1.0.1\libraries\Ethernet\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL\utility;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\include\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\include\avr\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\lib\gcc\avr\4.3.2\include\;</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <ForcedIncludeFiles>F:\DropBox\Dropbox\ArduixPL\examples\xPL_Lighting\.vmprogram\.xPL_Lighting.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>ARDUINO=101;__AVR_ATmega2560__;F_CPU=16000000L;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <ForcedIncludeFiles>F:\DropBox\Dropbox\ArduixPL\examples\xPL_Lighting_test\Visual Micro\.xPL_Lighting_test.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>ARDUINO=101;__AVR_ATmega328P__;F_CPU=16000000L;__AVR__;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>F:\DropBox\Dropbox\arduino-1.0.1\hardware\arduino\cores\arduino;F:\DropBox\Dropbox\arduino-1.0.1\hardware\arduino\variants\standard;F:\DropBox\Dropbox\arduino-1.0.1\libraries\EtherCard;F:\DropBox\Dropbox\arduino-1.0.1\libraries\EtherCard\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_EtherCard;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_EtherCard\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_Group;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_Group\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_Filter;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_Filter\utility;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_Lighting;F:\DropBox\Dropbox\arduino-1.0.1\libraries\xPL_Lighting\utility;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\include\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\include\avr\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\avr\;f:\dropbox\dropbox\arduino-1.0.1\hardware\tools\avr\lib\gcc\avr\4.3.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="functions order.txt" />
+    <None Include="xPL_Lighting_test.ino">
+      <FileType>CppCode</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_adapter.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_adapterethernet.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_bufferfiller.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_config.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_debug.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_eeprom.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Event.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingnode.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingoutputmapper.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingscene.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_lightingscenemember.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_main.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_message.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_node.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Numeric.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schema.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemaconfig.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaControl.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemafilter.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemagroup.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemahbeat.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_schemalighting.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_String.h.test" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_string.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl\utility\xpl_stringlist.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xPL\xPL.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_ethercard\xpl_adapterenc28j60.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_filter\xpl_filter.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_group\xpl_group.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingchannel.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingdevice.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightinggateway.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingmessage.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingnetwork.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingnode.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingoutputmapper.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingscene.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingscenemember.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\utility\xpl_lightingtypes.h" />
+    <ClInclude Include="..\..\..\arduino-1.0.1\libraries\xpl_lighting\xpl_lighting.h" />
+    <ClInclude Include="Visual Micro\.xPL_Lighting.vsarduino.h" />
+    <ClInclude Include="Visual Micro\.xPL_Lighting_test.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Adapter.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_AdapterENC28J60.cpp.old" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xpl_adapterethernet.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_BufferFiller.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Debug.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Eeprom.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Event.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingOutputMapper.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingScene.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingSceneMember.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_LightingTypes.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Main.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Message.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Node.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_Schema.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaConfig.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaControl.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaFilter.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaGroup.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaHbeat.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaLighting.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xPL_SchemaSensor.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xpl_string.cpp.test" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL\utility\xpl_string.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingChannel.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingDevice.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingGateway.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingMessage.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingNetwork.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingNode.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingOutputMapper.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingScene.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingSceneMember.cpp" />
+    <ClCompile Include="..\..\..\arduino-1.0.1\libraries\xPL_Lighting\utility\xPL_LightingTypes.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties arduino.upload.port="COM3" arduino.board.name="uno" arduino.board.desc="Arduino Uno" arduino.board.property_bag="uno.name=Arduino Uno&#xD;&#xA;uno.upload.protocol=arduino&#xD;&#xA;uno.upload.maximum_size=32256&#xD;&#xA;uno.upload.speed=115200&#xD;&#xA;uno.bootloader.low_fuses=0xff&#xD;&#xA;uno.bootloader.high_fuses=0xde&#xD;&#xA;uno.bootloader.extended_fuses=0x05&#xD;&#xA;uno.bootloader.path=optiboot&#xD;&#xA;uno.bootloader.file=optiboot_atmega328.hex&#xD;&#xA;uno.bootloader.unlock_bits=0x3F&#xD;&#xA;uno.bootloader.lock_bits=0x0F&#xD;&#xA;uno.build.mcu=atmega328p&#xD;&#xA;uno.build.f_cpu=16000000L&#xD;&#xA;uno.build.core=arduino&#xD;&#xA;uno.build.variant=standard&#xD;&#xA;" arduino.build.mcu="atmega328p" arduino.build.f_cpu="16000000L" arduino.build.core="arduino" arduino.upload.protocol="arduino" arduino.upload.speed="115200" arduino.upload.maximum_size="32256" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
