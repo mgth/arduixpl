@@ -11,3 +11,7 @@
 *.lai
 *.la
 *.a
+xPL_TouchSwitch
+xPL_Lighting_test
+xPL_Sensor
+xPL_Lighting
