@@ -1,8 +1,0 @@
-<VisualMicro>
-  <Program Ext=".ino" IncludeDebugInformation="0" Name="xPL_Lighting" Location="F:\ArduixPL\examples\xPL_Lighting">
-    <Compile CompilerErrors="0" StopOnError="True" OptimiseLibs="True" OptimiseCore="True" BuildPath="C:\Users\mathieu\AppData\Local\VMicro\Arduino\Builds\xPL_Lighting\mega2560" IncludesDebug="0" SketchName="xPL_Lighting" IsCompiled="1" />
-    <Platform Name="Arduino">
-      <Board CoreFolder="F:\arduino-1.0.1\hardware\arduino\cores\arduino" Name="mega2560" Description="Arduino Mega 2560 or Mega ADK" VariantFullPath="F:\arduino-1.0.1\hardware\arduino\variants\mega" />
-    </Platform>
-  </Program>
-</VisualMicro>
