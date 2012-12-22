@@ -139,8 +139,8 @@ void xPL_Main::begin(const __FlashStringHelper* vendor,const __FlashStringHelper
 
 	// if reset_pin HIGH, config is not loaded
 	pinMode(XPL_RESET_PIN, INPUT);
-
-	if ( eeprom.isxPL() && !digitalRead(XPL_RESET_PIN) )
+	// TODO : enable eeprom config when ok
+	if ( false && eeprom.isxPL() && !digitalRead(XPL_RESET_PIN) )
 	{
 		eeprom.setAddress(3);
 

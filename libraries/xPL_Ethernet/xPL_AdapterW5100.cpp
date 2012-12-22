@@ -36,7 +36,8 @@ bool xPL_AdapterW5100::loop() {
 
 			if (len)
 			{
-				xPL.receivedMessage(buffer);
+				VString msg(buffer);
+				xPL.receivedMessage(msg);
 			}
 		}
 
@@ -66,7 +67,7 @@ bool xPL_AdapterW5100::sendMessage(xPL_Message& msg)
 
 		//char* buffer = (char*)malloc( VString(msg).len() );
 
-		xPL_BufferFiller buf( VString(msg).len() );
+		xPL_BufferFiller buf( VString(&msg).len() );
 		msg.printTo(buf);
 
 		_udp.write(buf.buffer(),buf.position());

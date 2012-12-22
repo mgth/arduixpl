@@ -8,8 +8,8 @@
 //#undef PROGMEM
 //#define PROGMEM __attribute__((section(".progmem.data")))
 
-//#define XPL_DEBUG
-//#define XPL_DEBUG_MEM
+#define XPL_DEBUG
+#define XPL_DEBUG_MEM
 
 #define ENC28J60_PIN 10
 
