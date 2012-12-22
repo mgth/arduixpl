@@ -43,7 +43,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>D:\docs\Arduino\arduino-1.0.2\hardware\arduino\cores\arduino;D:\docs\Arduino\arduino-1.0.2\hardware\arduino\variants\standard;D:\docs\Arduino\libraries\EtherCard;D:\docs\Arduino\libraries\EtherCard\utility;D:\docs\Arduino\libraries\xPL;D:\docs\Arduino\libraries\xPL\utility;D:\docs\Arduino\libraries\xPL_Config;D:\docs\Arduino\libraries\xPL_Config\utility;d:\docs\arduino\arduino-1.0.2\hardware\tools\avr\avr\include\;d:\docs\arduino\arduino-1.0.2\hardware\tools\avr\avr\include\avr\;d:\docs\arduino\arduino-1.0.2\hardware\tools\avr\avr\;d:\docs\arduino\arduino-1.0.2\hardware\tools\avr\lib\gcc\avr\4.3.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\docs\Arduino\arduino-1.0.2\hardware\arduino\cores\arduino;D:\docs\Arduino\arduino-1.0.2\hardware\arduino\variants\standard;D:\docs\Arduino\libraries\OneWire;D:\docs\Arduino\libraries\OneWire\utility;D:\docs\Arduino\libraries\DallasTemperature;D:\docs\Arduino\libraries\DallasTemperature\utility;D:\docs\Arduino\libraries\xPL;D:\docs\Arduino\libraries\xPL\utility;D:\docs\Arduino\libraries\xPL_ENC28J60;D:\docs\Arduino\libraries\xPL_ENC28J60\utility;D:\docs\Arduino\libraries\xPL_Sensor;D:\docs\Arduino\libraries\xPL_Sensor\utility;d:\docs\arduino\arduino-1.5.gcc\hardware\tools\avr\avr\include\;d:\docs\arduino\arduino-1.5.gcc\hardware\tools\avr\avr\include\avr\;d:\docs\arduino\arduino-1.5.gcc\hardware\tools\avr\avr\;d:\docs\arduino\arduino-1.5.gcc\hardware\tools\avr\lib\gcc\avr\4.3.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>D:\docs\Arduino\xPL_Temperature\Visual Micro\.xPL_Temperature.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>ARDUINO=102;__AVR_ATmega328P__;F_CPU=16000000L;__AVR__;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -71,6 +71,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libraries\DallasTemperature\DallasTemperature.h" />
+    <ClInclude Include="..\libraries\EtherCard\EtherCard.h" />
+    <ClInclude Include="..\libraries\xPL\utility\vstring.h" />
     <ClInclude Include="..\libraries\xPL\utility\xPL_Adapter.h" />
     <ClInclude Include="..\libraries\xPL\utility\xpl_AdapterEthernet.h" />
     <ClInclude Include="..\libraries\xPL\utility\xPL_BufferFiller.h" />
@@ -87,12 +90,21 @@
     <ClInclude Include="..\libraries\xPL\utility\xPL_StringList.h" />
     <ClInclude Include="..\libraries\xPL\xPL.h" />
     <ClInclude Include="..\libraries\xPL_Config\xPL_Config.h" />
+    <ClInclude Include="..\libraries\xPL_ENC28J60\xPL_ENC28J60.h" />
     <ClInclude Include="..\libraries\xPL_EtherCard\xPL_AdapterENC28J60.h" />
     <ClInclude Include="..\libraries\xPL_Ethernet\xPL_AdapterW5100.h" />
     <ClInclude Include="..\libraries\xPL_Sensor\xPL_Sensor.h" />
     <ClInclude Include="Visual Micro\.xPL_Temperature.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\libraries\DallasTemperature\DallasTemperature.cpp" />
+    <ClCompile Include="..\libraries\EtherCard\dhcp.cpp" />
+    <ClCompile Include="..\libraries\EtherCard\dns.cpp" />
+    <ClCompile Include="..\libraries\EtherCard\enc28j60.cpp" />
+    <ClCompile Include="..\libraries\EtherCard\EtherCard.cpp" />
+    <ClCompile Include="..\libraries\EtherCard\tcpip.cpp" />
+    <ClCompile Include="..\libraries\EtherCard\webutil.cpp" />
+    <ClCompile Include="..\libraries\xPL\utility\vstring.cpp" />
     <ClCompile Include="..\libraries\xPL\utility\xPL_Adapter.cpp" />
     <ClCompile Include="..\libraries\xPL\utility\xpl_AdapterEthernet.cpp" />
     <ClCompile Include="..\libraries\xPL\utility\xPL_BufferFiller.cpp" />
@@ -106,6 +118,7 @@
     <ClCompile Include="..\libraries\xPL\utility\xPL_String.cpp" />
     <ClCompile Include="..\libraries\xPL\xPL.cpp" />
     <ClCompile Include="..\libraries\xPL_Config\xPL_Config.cpp" />
+    <ClCompile Include="..\libraries\xPL_ENC28J60\xPL_ENC28J60.cpp" />
     <ClCompile Include="..\libraries\xPL_EtherCard\xPL_AdapterENC28J60.cpp" />
     <ClCompile Include="..\libraries\xPL_Ethernet\xPL_AdapterW5100.cpp" />
     <ClCompile Include="..\libraries\xPL_Sensor\xPL_Sensor.cpp" />
@@ -115,7 +128,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties arduino.board.name="uno" arduino.board.desc="Arduino Uno" arduino.board.property_bag="uno.name=Arduino Uno&#xD;&#xA;uno.upload.protocol=arduino&#xD;&#xA;uno.upload.maximum_size=32256&#xD;&#xA;uno.upload.speed=115200&#xD;&#xA;uno.bootloader.low_fuses=0xff&#xD;&#xA;uno.bootloader.high_fuses=0xde&#xD;&#xA;uno.bootloader.extended_fuses=0x05&#xD;&#xA;uno.bootloader.path=optiboot&#xD;&#xA;uno.bootloader.file=optiboot_atmega328.hex&#xD;&#xA;uno.bootloader.unlock_bits=0x3F&#xD;&#xA;uno.bootloader.lock_bits=0x0F&#xD;&#xA;uno.build.mcu=atmega328p&#xD;&#xA;uno.build.f_cpu=16000000L&#xD;&#xA;uno.build.core=arduino&#xD;&#xA;uno.build.variant=standard&#xD;&#xA;" arduino.build.mcu="atmega328p" arduino.build.f_cpu="16000000L" arduino.build.core="arduino" arduino.upload.protocol="arduino" arduino.upload.speed="115200" arduino.upload.maximum_size="32256" arduino.upload.port="COM4" />
+      <UserProperties arduino.board.name="atmega328" arduino.board.desc="Arduino Duemilanove w/ ATmega328" arduino.board.property_bag="atmega328.name=Arduino Duemilanove w/ ATmega328&#xD;&#xA;atmega328.upload.protocol=arduino&#xD;&#xA;atmega328.upload.maximum_size=30720&#xD;&#xA;atmega328.upload.speed=57600&#xD;&#xA;atmega328.bootloader.low_fuses=0xFF&#xD;&#xA;atmega328.bootloader.high_fuses=0xDA&#xD;&#xA;atmega328.bootloader.extended_fuses=0x05&#xD;&#xA;atmega328.bootloader.path=atmega&#xD;&#xA;atmega328.bootloader.file=ATmegaBOOT_168_atmega328.hex&#xD;&#xA;atmega328.bootloader.unlock_bits=0x3F&#xD;&#xA;atmega328.bootloader.lock_bits=0x0F&#xD;&#xA;atmega328.build.mcu=atmega328p&#xD;&#xA;atmega328.build.f_cpu=16000000L&#xD;&#xA;atmega328.build.core=arduino&#xD;&#xA;atmega328.build.variant=standard&#xD;&#xA;" arduino.build.mcu="atmega328p" arduino.build.f_cpu="16000000L" arduino.build.core="arduino" arduino.upload.protocol="arduino" arduino.upload.speed="57600" arduino.upload.maximum_size="30720" arduino.upload.port="COM4" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

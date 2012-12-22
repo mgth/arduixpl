@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Fichiers sources\EtherCard">
+      <UniqueIdentifier>{7b91c2e5-cb35-4f26-8029-2eb2ed6f970d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Dallas">
+      <UniqueIdentifier>{aa164dce-1060-4d1e-ab63-fd42f5419367}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="xPL_Temperature.ino" />
@@ -75,8 +81,20 @@
     <ClInclude Include="..\libraries\xPL_Ethernet\xPL_AdapterW5100.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="..\libraries\EtherCard\EtherCard.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\xPL_ENC28J60\xPL_ENC28J60.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\xPL\utility\vstring.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
     <ClInclude Include="Visual Micro\.xPL_Temperature.vsarduino.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libraries\DallasTemperature\DallasTemperature.h">
+      <Filter>Fichiers sources\Dallas</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +145,33 @@
     </ClCompile>
     <ClCompile Include="..\libraries\xPL_Config\xPL_Config.cpp">
       <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\EtherCard\EtherCard.cpp">
+      <Filter>Fichiers sources\EtherCard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\EtherCard\tcpip.cpp">
+      <Filter>Fichiers sources\EtherCard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\EtherCard\webutil.cpp">
+      <Filter>Fichiers sources\EtherCard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\EtherCard\dhcp.cpp">
+      <Filter>Fichiers sources\EtherCard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\EtherCard\dns.cpp">
+      <Filter>Fichiers sources\EtherCard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\EtherCard\enc28j60.cpp">
+      <Filter>Fichiers sources\EtherCard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\xPL_ENC28J60\xPL_ENC28J60.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\xPL\utility\vstring.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libraries\DallasTemperature\DallasTemperature.cpp">
+      <Filter>Fichiers sources\Dallas</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,14 +1,13 @@
 <VisualMicro>
   <Program Name="xPL_Temperature" Ext=".ino" Location="D:\docs\Arduino\xPL_Temperature">
-    <Compile CompilerErrors="0" ConfigurationName="Debug" StopOnError="True" BuildPath="C:\Users\mathieu\AppData\Local\VMicro\Arduino\Builds\xPL_Temperature\uno" OptimiseLibs="False" OptimiseCore="False" IncludeDebug="0" IncludesDebug="0" SketchName="xPL_Temperature" IsCompiled="1" />
+    <Compile CompilerErrors="0" ConfigurationName="Debug" StopOnError="True" OptimiseLibs="False" OptimiseCore="False" BuildPath="C:\Users\mathieu\AppData\Local\VMicro\Arduino\Builds\xPL_Temperature\atmega328" IncludeDebug="0" IncludesDebug="0" SketchName="xPL_Temperature" IsCompiled="1" />
     <Platform Name="Arduino">
-      <Board CoreFolder="D:\docs\Arduino\arduino-1.0.2\hardware\arduino\cores\arduino" VariantFullPath="D:\docs\Arduino\arduino-1.0.2\hardware\arduino\variants\standard" Name="uno" Description="Arduino Uno" />
+      <Board Name="atmega328" Description="Arduino Duemilanove w/ ATmega328" CoreFolder="D:\docs\Arduino\arduino-1.0.2\hardware\arduino\cores\arduino" VariantFullPath="D:\docs\Arduino\arduino-1.0.2\hardware\arduino\variants\standard" />
     </Platform>
     <Debug />
     <VCCodeModel>
       <VCCodeMacros>
-        <VCCodeMacro Name="ARDUINO" Value="102" />
-        <VCCodeMacro Name="XPL_NODE_H" />
+        <VCCodeMacro Name="XPL_DEBUG_H" />
       </VCCodeMacros>
     </VCCodeModel>
   </Program>
