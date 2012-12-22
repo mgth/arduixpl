@@ -36,7 +36,7 @@ protected:
 
 public:
 
-virtual void fromString(const xPL_String& s)
+virtual void fromString(const VString& s)
 	{
 			unsigned long val=0;
 			//bool indec = false;
@@ -111,11 +111,14 @@ protected:
 	virtual uint16_t load(uint8_t dec=0) const {return _val*divider(dec);}
 	virtual byte dec() const { return 0; }
 
-	size_t printTo(Print& p) const {
-		return printDecTo(0,p);
+	size_t printTo(Print& p) const
+	{
+		return p.print(_val);
+		//return printDecTo(0,p);
 	}
 public:
-	xPL_Int(const xPL_String& s) { fromString(s); }
+	xPL_Int(const VString& s) { fromString(s); }
+	xPL_Int(int i):_val(i) { }
 
 	operator int() { return _val; }
 
@@ -134,7 +137,8 @@ protected:
 	}
 public:
 	xPL_Float() { _val=0.0; }
-	xPL_Float(const xPL_String& s) { fromString(s); }
+	xPL_Float(const VString& s) { fromString(s); }
+	xPL_Float(float f) { _val=f; }
 
 	operator float() { return _val; }
 	xPL_Float& operator=(float val) { _val = val; return *this;}

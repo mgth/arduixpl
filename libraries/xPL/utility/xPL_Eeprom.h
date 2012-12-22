@@ -23,7 +23,7 @@
 #ifndef XPL_EEPROM_H
 #define	XPL_EEPROM_H
 #include "xPL_Define.h"
-#include "xPL_String.h"
+#include "VString.h"
 //#include <../eeprom/eeprom.h>
 
 class xPL_Eeprom : public Print {
@@ -47,7 +47,7 @@ public:
 	int readInt();
 	long readLong();
 	*/
-	xPL_String readString(bool step=true);
+	VString readString(bool step=true);
 
     virtual size_t write(uint8_t value);
 

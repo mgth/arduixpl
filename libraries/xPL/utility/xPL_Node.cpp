@@ -1,16 +1,7 @@
 #include "xPL_Node.h"
 #include "xPL_Message.h"
 
-//xPL_Message xPL_Node::msgIn;
-//xPL_Message xPL_Node::msgOut;
-//xPL_EepromParser xPL_Node::eeprom;
-
-
-xPL_Node* xPL_Node::next() const { return _next; }
-xPL_Node* xPL_Node::child() const { return _child; }
-xPL_Node* xPL_Node::parent() const { return _parent; }
-
-xPL_Node* xPL_Node::findOrAdd(const xPL_String& id)
+xPL_Node* xPL_Node::findOrAdd(const VString& id)
 {
 	xPL_Node* n = findChild(id);
 	if (!n) n = add(id);
@@ -19,16 +10,16 @@ xPL_Node* xPL_Node::findOrAdd(const xPL_String& id)
 
 xPL_Node* xPL_Node::defaultNode() const
 {
-	if (next()) return next()->defaultNode();
+	if (_next) return _next->defaultNode();
 	return const_cast<xPL_Node*>(this);
 }
-xPL_Node* xPL_Node::defaultChild() const
+xPL_Node* xPL_NodeParent::defaultChild() const
 {			
-	if (child()) return child()->defaultNode();
+	if (_child) return _child->defaultNode();
 	return NULL;
 }
 
-xPL_Node* xPL_Node::addChild( xPL_Node* node)
+xPL_Node* xPL_NodeParent::addChild( xPL_Node* node)
 {
 	if (node)
 	{ 
@@ -37,16 +28,16 @@ xPL_Node* xPL_Node::addChild( xPL_Node* node)
 		_child = node;
 	}
 	return node;
-
 }
-xPL_Node* xPL_Node::find(const xPL_String& cmpid) {
-		
+
+xPL_Node* xPL_Node::find(const VString& cmpid) {
+
 	if ( id() && (*id() == cmpid) ) return this;
-	if (next()) return next()->find(cmpid);
+	if (_next) return _next->find(cmpid);
 	return NULL;
 }
 
-xPL_Node* xPL_Node::findChild(const xPL_String& id) { if (child()) return child()->find(id); return NULL; }
+xPL_Node* xPL_Node::findChild(const VString& id) { if (child()) return child()->find(id); return NULL; }
 
 int xPL_Node::count() const {
 	class :public xPL_Event {
@@ -63,27 +54,38 @@ int xPL_Node::count() const {
 
 xPL_Node::~xPL_Node() { deleteChilds(); }
 
-void xPL_Node::deleteNode(xPL_Node* previous, bool deleteAll)
+void xPL_Node::deleteNode(bool deleteAll)
 {
-	deleteChilds(); 
-
-	if (deleteAll && next()) { next()->deleteNode(this,deleteAll); }
-	previous->_next = _next;
-
+	if (deleteAll && _next) {
+		_next->deleteNode(deleteAll);
+	}
+	// TODO, adjust next of previous item.
 	DELETE(this);
 }
 
-void xPL_Node::deleteChilds() { if (child()) { child()->deleteNode(this,true); } }
-
+void xPL_NodeParent::deleteChilds() 
+{
+	xPL_Node* n = _child;
+	while(n)
+	{
+		xPL_Node* ndel = n; n = n->_next;
+		DELETE(ndel);
+	}
+	_child=NULL;
+}
 
 void xPL_Node::sendEvent ( xPL_Event* evt, bool childsOnly, bool all)
 {
-	if (all && next()) { next()->sendEvent(evt,childsOnly,all);}
+	if (all && _next) { _next->sendEvent(evt,childsOnly,all);}
 	if (childsOnly || evt->send(this))
 	{ 
 		if (child()) child()->sendEvent(evt,false,true);
 		evt->close(this);
 	}
+}
+void xPL_Node::sendEventConst ( xPL_Event* evt, bool childsOnly, bool all) const
+{
+	const_cast<xPL_Node*>(this)->sendEvent(evt,childsOnly,all);
 }
 
 /********************************************************************
@@ -92,7 +94,7 @@ CONFIG
 
 xPL_Node* xPL_Node::readConfig(xPL_Eeprom& eeprom)
 {
-	xPL_String id=eeprom.readString();
+	VString id=eeprom.readString();
 	if (id) return findOrAdd(id);
 	return NULL;
 }

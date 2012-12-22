@@ -26,49 +26,22 @@
 #include "xPL_Node.h"
 
 class xPL_Key: public xPL_Node {
-private:
-	xPL_String _key;
-	const xPL_Printable* _value;
-	bool _allocated;
-
 protected:
 public:
+	virtual const __FlashStringHelper* className() const { return S(message); }	
+	VString key;
+	VString value;
 
-	void parse(xPL_String& buffer);
+	void parse(VString& buffer);
 
-	xPL_Key(xPL_String& buffer);
+	xPL_Key(VString& buffer);
 	xPL_Key(xPL_Key* key);
-	xPL_Key();
-	xPL_Key(const xPL_String& key,const xPL_Printable* value, bool alloc=false) {
-		_key   = key;
-		_value = value;
-		if (_value && alloc) _allocated=true;
-		else _allocated = false;
-	}
-	xPL_Key(const xPL_String& key, const prog_char* value) { //TODO : -> xPL_string
-		_key   = key;
-		_value = new xPL_String(value);
-		if (_value)
-			_allocated=true;
-		else
-			_allocated = false;
-	}
-
-	virtual ~xPL_Key();
+	xPL_Key() {};
+	xPL_Key(const VString& key,const VString&  value):key(key),value(value) { }
 
 	//properties
-	xPL_String& key() { return _key; }
-	virtual const xPL_String* id() const { return &_key; }
-	const xPL_Printable* value() { return _value; }
-	xPL_String& sValue() { return *(xPL_String*)_value; }
+	virtual const VString* id() const { return &key; }
 
-	//operators
-	bool operator==(xPL_String s) { return _key == s; }
-	bool operator!=(xPL_String s) { return _key != s; }
-	bool operator==(xPL_String &s) { return _key == s; }
-	bool operator!=(xPL_String &s) { return _key != s; }
-	bool operator==(const prog_char* s) { return _key == s; }
-	bool operator!=(const prog_char* s) { return _key != s; }
 
 
 	bool sendEventConfigure();
@@ -96,57 +69,45 @@ public:
 				if (n->id()) len += n->id()->printTo(*print);
 				return false;
 			} 
-		} evt;
+		} evt ;
 
 		evt.print=&p;
 		evt.len=0;
 
-		const_cast<xPL_Node*>(_node)->sendEvent(&evt,true);
+		_node->sendEventConst(&evt,true);
 
 		return evt.len;
 	}
 };
 
-class xPL_Address: public xPL_Printable {
+class xPL_Address: public Printable {
 public:
-	xPL_String vendor;
-	xPL_String device;
-	xPL_String instance;
+	VString vendor;
+	VString device;
+	VString instance;
 
 	xPL_Address() {}
-	void parse(const xPL_String& s);
+	void parse(const VString& s);
 
 	virtual size_t printTo(Print& p) const;
 
 
-	xPL_String& schClass() { return device; }
-	xPL_String& schType() { return instance; }
-
-	xPL_String& msgVendor() { return vendor; }
-	xPL_String& msgType() { return instance; }
-
-	const xPL_String* id() const { return &instance; }
+	const VString* id() const { return &instance; }
 
 	void setAny() { instance=S(_asterisk); vendor.clear(); device.clear(); }
-	bool isAny() { return instance.isAny(); } 
+	bool isAny() { return instance.charAt(0)=='*'; } 
 
 	bool operator==(const xPL_Address& addr);
 };
 
-class xPL_String_Index : public xPL_Printable {
+class xPL_String_Index : public Printable {
 private:
-	const prog_char* _key;
-	xPL_String _index;
+	const __FlashStringHelper* _key;
+	int _index;
 public:
 	virtual size_t printTo(Print& p) const;
 
-	xPL_String_Index(const prog_char* key, const xPL_String& index)
-	{
-		_key=key;
-		_index = index;
-	}
-
-	xPL_String_Index(const prog_char* key, int index)
+	xPL_String_Index(const __FlashStringHelper* key, int index)
 	{
 		_key=key;
 		_index = index;
@@ -154,64 +115,65 @@ public:
 
 };
 
-class xPL_Message : public xPL_Node {
-private:
-	xPL_String _message;
-	struct
-	{
-		bool targeted : 1;
-		bool matchFilter : 1 ;
-		bool contentParsed : 1;
-	} _state;
-/*
-	struct
-	{
-		bool targeted;
-		bool matchFilter;
-		bool contentParsed;
-	} _state;
-*/
+class xPL_Message : public xPL_NodeParent {
 public:
-	xPL_Message();
-	xPL_Message(const prog_char*  msgType, const prog_char* schClass, const prog_char* schType);
-
-	virtual ~xPL_Message();
-
 	xPL_Address msgType;
 	byte hop;
 	xPL_Address source;
 	xPL_Address target;
 	xPL_Address schema;
 
-	void setTargeted(bool b=true ) { _state.targeted=b; }
+	xPL_Message() {};
+	xPL_Message(const __FlashStringHelper*  msgType, const __FlashStringHelper* schClass, const __FlashStringHelper* schType);
+
+	static size_t printKey(Print& p, const VString& key,const VString& value);
+	static size_t printKey(Print& p, const VString& key,const Printable& value);
+	static size_t printKey(Print& p, const VString& key,int value);
+	static size_t printOptionKey(Print& p, const __FlashStringHelper* value);
+	static size_t printOptionKey(Print& p, const __FlashStringHelper* value,int index);
+
+	bool send(bool del=false);
+
+	virtual size_t printTo(Print& p) const;
+	virtual size_t printContentTo(Print& p) const;
+};
+
+
+class xPL_MessageIn : public xPL_Message {
+private:
+	VString _message;
+	VString _input;
+	struct
+	{
+		bool targeted : 1;
+		bool matchFilter : 1 ;
+		bool contentParsed : 1;
+	} _state;
+
+public:
+	xPL_MessageIn(VString& buffer);
+
+	void setTargeted(bool b=true )  { _state.targeted=b; }
 	void setMatchFilter(bool b=true){ _state.matchFilter=b; }
 
 	bool targeted(){ return _state.targeted && _state.matchFilter; }
 
-	xPL_Key* getKey(const prog_char* name);
-	xPL_String getValue(const prog_char* name);
-	xPL_Key* getKeyCopy(const prog_char* name);
+	xPL_Key* getKey(const __FlashStringHelper* name);
+	VString getValue(const __FlashStringHelper* name);
+	xPL_Key* getKeyCopy(const __FlashStringHelper* name);
 
-	void addKey(const prog_char* key,const xPL_Printable* value, bool alloc=false);
-	void addKey(const prog_char* key,const prog_char* value);
-	void addOptionKey(const prog_char* value);
-	void addOptionKey(const prog_char* value,int index);
 
-	bool parseHeader(char* buffer);
+	bool parseHeader();
 	bool parseContent();
 
-	bool parse(char* buffer);
+	bool parse();
 
-	virtual size_t printTo(Print& p) const;
-
-	bool send(bool del=false);
-
-	bool isTypeCommand (const prog_char* type,const prog_char* cmd );
+	bool isTypeCommand (const __FlashStringHelper* type,const __FlashStringHelper* cmd );
 
 #undef C
 #undef CF
-#define C(s) const xPL_String key_##s()  { return getValue(S(s)); }
-#define CF(f,s) const xPL_String key_##f()  { return getValue(S(f)); }
+#define C(s) const VString key_##s()  { return getValue(S(s)); }
+#define CF(f,s) const VString key_##f()  { return getValue(S(f)); }
 #include "xPL_Stringlist.h"
 };
 

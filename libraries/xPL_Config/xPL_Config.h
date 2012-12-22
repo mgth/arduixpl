@@ -30,15 +30,15 @@ class xPL_Config : public xPL_Hbeat {
 private:
 
 protected:
-	virtual bool parseMessage(xPL_Message& msg);
+	virtual bool parseMessage(xPL_MessageIn& msg);
 
 	virtual bool loadConfig(xPL_Eeprom& eeprom);
 	virtual bool loadDefaultConfig();
 
-	bool sendConfig(const prog_char* type) const;
+	bool sendConfig(const __FlashStringHelper* type) const;
 
 public:
-	virtual const prog_char* className() const { return S(config); }
+	virtual const __FlashStringHelper* className() const { return S(config); }
 
 
 

@@ -36,7 +36,7 @@ private:
 public:
 	IPAddress bin;
 	virtual size_t printTo(Print& p) const;
-	void fromString(xPL_String &s);
+	void fromString(VString &s);
 	int toEeprom(xPL_Eeprom& eeprom);
 	int toArray(uint8_t* ip);
 	int fromEeprom(xPL_Eeprom& eeprom);
@@ -48,7 +48,7 @@ private:
 public:
 	uint8_t bin[6];
 	virtual size_t printTo(Print& p) const;
-	void fromString(xPL_String &s);
+	void fromString(VString &s);
 	void fromEeprom(xPL_Eeprom& eeprom);
 	void toEeprom(xPL_Eeprom& eeprom);
 	void toArray(uint8_t* mac);
@@ -64,8 +64,6 @@ protected:
 	xPL_IpAddress _mask;
 	bool _dhcp;
 
-	xPL_BufferFiller _bfill;
-
 
 //configuration
 //EEPROM
@@ -73,8 +71,8 @@ protected:
 	virtual bool loadDefaultConfig();
 	virtual bool storeConfig(xPL_Eeprom& eeprom);
 //Messages
-	virtual bool msgAddConfigList(xPL_Message& msg);
-	virtual bool msgAddConfigCurrent(xPL_Message& msg);
+	virtual size_t printConfigList(Print& p);
+	virtual size_t printConfigCurrent(Print& p);
 	virtual bool configure(xPL_Key& key);
 
 public:

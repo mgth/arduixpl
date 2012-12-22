@@ -1,37 +1,20 @@
 #include "xPL_Message.h"
-#include "xPL_String.h"
+#include "vstring.h"
 #include "xPL_Adapter.h"
 
 #include "xPL_Numeric.h"
 
-xPL_Key::xPL_Key() {
-	_allocated=false;
-	_value=NULL;
-}
-xPL_Key::xPL_Key( xPL_String& buffer)
+xPL_Key::xPL_Key(VString&  buffer)
 {
-	_allocated=false;
 	parse(buffer);
 }
 
-void xPL_Key::parse(xPL_String& buffer)
+void xPL_Key::parse(VString& buffer)
 {
-	if (_allocated)
-	{
-		DELETE(_value);
-		_allocated=false;
-	}
-	_key = buffer;
-	_key.parseTo('\n',buffer);
-	_value = new xPL_String();
-	if (_value)
-	{
-		_key.parseTo('=',sValue());
-		_allocated=true;
-	}
+	key = buffer;
+	buffer = key.parseTo('\n');
+	value = key.parseTo('=');
 }
-
-xPL_Key::~xPL_Key() { if (_allocated) { DELETE(_value) } }
 
 bool xPL_Key::sendEventConfigure() {
 		class :public xPL_Event {
@@ -41,24 +24,31 @@ bool xPL_Key::sendEventConfigure() {
 		} evt;
 
 		evt.key = this;
-#ifdef XPL_DEBUG
-		Serial.println("parse:");
-		Serial.println(*this);
-#endif
+
+		DBG(F("parse:"),*this);
+
 		xPL.sendEvent(&evt);
 		return false;
 }
 
 size_t xPL_Key::printTo(Print& p) const {
-	return xPL_Printable::emit_p(p, PSTR("§=$"),&_key,_value);
+
+	size_t len = 0;
+
+	len += key.printlnNzTo(p,'=');
+	len += value.printNzTo(p);
+
+	return len;
 }
 
 size_t xPL_Address::printTo(Print& p) const {
-	//return xPL_Printable::emit_p(p, PSTR("§-§.$"),&vendor,&device,&instance);
-	size_t len=0;
-	if (vendor) len+=vendor.printlnTo(p,'-');
-	if (device) len+=device.printlnTo(p,'.');
-	len+=instance.printTo(p);
+
+	size_t len = 0;
+
+	len += vendor.printlnNzTo(p,'-');
+	len += device.printlnNzTo(p,'.');
+	len += instance.printTo(p);
+	
 	return len;
 }
 
@@ -66,15 +56,15 @@ size_t xPL_String_Index::printTo(Print& p) const {
 	return xPL_Printable::emit_p(p, PSTR("&[$]"),_key,&_index);
 }
 
-void xPL_Address::parse(const xPL_String& s) {
+void xPL_Address::parse(const VString& s) {
 	vendor = s;
-	vendor.parseTo('.',instance);
+	instance = vendor.parseTo('.');
 	if (!instance) {
-		vendor.parseTo('-',instance); device.clear();
+		instance = vendor.parseTo('-'); device.clear();
 		if (!instance) { instance = vendor; vendor.clear(); }
 	}
 	else {
-		vendor.parseTo('-',device);
+		device = vendor.parseTo('-');
 		if (!device) { device=vendor; vendor.clear(); }	
 	}
 }
@@ -86,32 +76,129 @@ bool xPL_Address::operator==(const xPL_Address& addr) {
 	return true;
 }
 
-xPL_Message::xPL_Message()
+/********************************************************************
+xPL_Message
+********************************************************************/
+xPL_Message::xPL_Message(const __FlashStringHelper* mType,const __FlashStringHelper* sClass,const __FlashStringHelper* sType)
 {
+	msgType.vendor = S(xpl);
+	msgType.instance = mType;
+
+	hop=1;
+	
+	source = xPL.source();
+	
+	target.setAny();
+	
+	schema.device = sClass;
+	schema.instance = sType;
+}
+
+size_t xPL_Message::printKey(Print&p, const VString& key,int value) {
+	return
+	key.printlnNzTo(p,'=') +
+	p.print(value) +
+	p.print('\n');
+}
+size_t xPL_Message::printKey(Print&p, const VString& key,const Printable& value) {
+	return
+	key.printlnNzTo(p,'=') +
+	p.print(value) +
+	p.print('\n');
+}
+
+size_t xPL_Message::printKey(Print&p, const VString& key,const VString& value) {
+	return
+	key.printlnNzTo(p,'=') +
+	value.printlnNzTo(p);
+}
+
+size_t xPL_Message::printOptionKey(Print&p, const __FlashStringHelper* value) {
+	return printKey(p,S(option),value);
+}
+
+size_t xPL_Message::printOptionKey(Print&p, const __FlashStringHelper* value,int index)
+{
+	return
+	VString(S(option)).printlnTo(p,'=') +
+	VString(value).printlnTo(p,'[') +
+	p.print(index) +
+	p.print(F("]\n"));
+}
+
+size_t xPL_Message::printTo(Print& p) const //710
+{
+  int len=0;
+
+ len += p.print(msgType);
+ len += p.print(F("\n{\n"));
+ len += printKey(p,S(hop),hop);
+ len += printKey(p,S(source),source);
+ len += printKey(p,S(target),target);
+ len += p.print(F("}\n"));
+ len += p.print(schema);
+ len += p.print(F("\n{\n"));
+ len += printContentTo(p);
+ len += p.print(F("}"));
+
+ return len;
+/*
+xPL_ChildsPrinter content(*this);
+
+ xPL_Int h(hop);
+
+ return xPL_Printable::emit_p(p,
+		PSTR(
+		"$\n"
+		"{\n"
+		"&=$\n"
+		"&=$\n"
+		"&=$\n"
+		"}\n"
+		"$\n"
+		"{\n"
+		"$"
+		"}\n"
+		),
+		&msgType,
+		S(hop),&h,
+		S(source),&source,
+		S(target),&target,
+		&schema,
+		&content
+		);
+*/		
+}
+
+size_t xPL_Message::printContentTo(Print& p) const {	return 0;	//	return xPL_ChildsPrinter(*this).printTo(p);}
+
+
+bool xPL_Message::send(bool del){
+	bool r = xPL.sendMessage(*this);
+	if ( del ) { DELETE(this); }
+	return r;
+}
+
+/********************************************************************
+xPL_MessageIn
+********************************************************************/
+xPL_MessageIn::xPL_MessageIn(VString& buffer)
+{
+	_message = buffer;
+	_input = buffer;
+
 	_state.targeted = false;
 	_state.matchFilter = true;
 	_state.contentParsed = false;
 }
 
-xPL_Message::~xPL_Message() { deleteChilds(); }
 
-xPL_Message::xPL_Message(const prog_char* mType,const prog_char* sClass,const prog_char* sType)
+bool xPL_MessageIn::isTypeCommand (const __FlashStringHelper* type,const __FlashStringHelper* cmd )
 {
-	msgType.msgVendor() = S(xpl);
-	msgType.msgType() = mType;
-	hop=1;
-	source = xPL.source();
-	target.setAny();
-	schema.schClass() = sClass;
-	schema.schType() = sType;
+	return (schema.instance==type && key_command()==cmd);
 }
 
-bool xPL_Message::isTypeCommand (const prog_char* type,const prog_char* cmd )
-{
-	return (schema.schType()==type && key_command()==cmd);
-}
-
-xPL_Key* xPL_Message::getKey(const prog_char* name)
+xPL_Key* xPL_MessageIn::getKey(const __FlashStringHelper* name)
 {
 	if (parseContent())
 	{
@@ -120,73 +207,54 @@ xPL_Key* xPL_Message::getKey(const prog_char* name)
 	return NULL;
 }
 
-xPL_String xPL_Message::getValue(const prog_char* s)
+VString xPL_MessageIn::getValue(const __FlashStringHelper* s)
 {
-	xPL_String r;
+	VString r;
 	xPL_Key*k = getKey(s);
-	if(k) r = k->sValue();
+	if(k) r = k->value;
 	return r;
 }
 
-xPL_Key* xPL_Message::getKeyCopy(const prog_char* name)
+xPL_Key* xPL_MessageIn::getKeyCopy(const __FlashStringHelper* name)
 {
-		xPL_String* value = new xPL_String;
-		if (parent()) value->load( ((xPL_Message*)parent())->getValue(name) );
-
-		xPL_Key* k= new xPL_Key( name, value, true);
-
+		xPL_Key* k= new xPL_Key();
+		k->key = name;
+		if (_parent)
+		{
+			k->value = ((xPL_MessageIn*)_parent)->getValue(name);
+			k->value.load();
+		}
 		return k;
 }
 
 
-void xPL_Message::addKey(const prog_char* key,const xPL_Printable* value, bool alloc) {
-	addChild(new xPL_Key(key,value,alloc)); 
-}
 
-void xPL_Message::addKey(const prog_char* key, const prog_char* value) {
-	addKey(key, new xPL_String(value), true);
-}
-
-void xPL_Message::addOptionKey(const prog_char* value) {
-	addKey(S(option), value);
-}
-
-void xPL_Message::addOptionKey(const prog_char* value,int index)
-{
-	addKey(
-		S(option),
-		new xPL_String_Index( value, index),
-		true
-	);
-}
-
-bool xPL_Message::parseHeader(char* buffer) {
+bool xPL_MessageIn::parseHeader() {
      enum {
 	  END, ERROR, MSG_TYPE, SCHEMA_NAME, START_SECTION, IN_SECTION
      } state = MSG_TYPE;
 
-	_message.set(XPL_STRING_RAM,buffer);
-	_state.contentParsed = true;
+//	_state.contentParsed = true;
 
 	xPL_Key k;
 
 	do
 	{
-		k.parse(_message);
-		if (!k.key()) { state=ERROR; }
-		char c = k.key().charAt(0);
+		k.parse(_input);
+		if (!k.key) { state=ERROR; }
+		char c = k.key.charAt(0);
 
 		switch(state)
 		{
 			case MSG_TYPE:
-				msgType.parse(k.key()); 
-				if (msgType.msgVendor() == S(xpl))
+				msgType.parse(k.key); 
+				if (msgType.vendor == S(xpl))
 					state=START_SECTION;
 				else
 					state=ERROR;
 				break;
 			case SCHEMA_NAME:
-				schema.parse(k.key()); 
+				schema.parse(k.key); 
 				state=END;
 				break;
 			case START_SECTION:
@@ -196,14 +264,14 @@ bool xPL_Message::parseHeader(char* buffer) {
 				if (c=='}') { state=SCHEMA_NAME; }
 				else
 				{
-						if ( k == S(hop) ) {
-							hop=xPL_Int(k.sValue());
+						if ( k.key == S(hop) ) {
+							hop=xPL_Int(k.value);
 						}
-						else if ( k == S(source) ) {
-							source.parse(k.sValue());
+						else if ( k.key == S(source) ) {
+							source.parse(k.value);
 						}
-						else if ( k == S(target) ) {
-							target.parse(k.sValue());
+						else if ( k.key == S(target) ) {
+							target.parse(k.value);
 						}
 				}
 				break;
@@ -216,7 +284,7 @@ bool xPL_Message::parseHeader(char* buffer) {
 	return state==END;
 }
 
-bool xPL_Message::parseContent() //390
+bool xPL_MessageIn::parseContent() //390
 {
 	if (_state.contentParsed) return true; //14
 
@@ -228,11 +296,10 @@ bool xPL_Message::parseContent() //390
 	
 	do 
 	{
-		
-		k = new xPL_Key(_message); //278
+		k = new xPL_Key(_input); //278
 		if (!k) { state=ERROR; } //12
 
-		char c = k->key().charAt(0);
+		char c = k->key.charAt(0);
 
 		switch(state)
 		{
@@ -261,67 +328,13 @@ bool xPL_Message::parseContent() //390
 	return state==END;
 }
 
-bool xPL_Message::parse(char* buffer) { 
-	if (parseHeader(buffer)) return parseContent();
-	return false;
+bool xPL_MessageIn::parse() { 
+	return (parseHeader() && parseContent());
 }
-
-size_t xPL_Message::printTo(Print& p) const //710
-{
 /*
-  size_t l =0;
-
-  l += p.println(msgType); //70
-  l += p.println('{'); //16
-
-  l += xPL_String(hop).printKey(p,S(hop)); //55
-
-  l += source.printKey(p,S(source)); //22
-
-  l += target.printKey(p,S(target)); //22
-
-  l += p.println('}');//16
-  l += schema.printlnTo(p); //22
-  l += p.println('{'); //16
-
- xPL_EventPrintlnTo evt(p,l);
-
-  const_cast<xPL_Message*>(this)->sendEvent(&evt,true); //148
-          
-  l += p.println('}');//16
-
-  return l;
- */ 
-	
-  xPL_String h((int)hop);
-
-  xPL_ChildsPrinter content(*(xPL_Node*)this);
-
-	return xPL_Printable::emit_p(p,
-		PSTR(
-		"$\n"
-		"{\n"
-		"hop=$\n"
-		"source=$\n"
-		"target=$\n"
-		"}\n"
-		"$\n"
-		"{\n"
-		"$\n"
-		"}\n"
-		),
-		&msgType,
-		&h,
-		&source,
-		&target,
-		&schema,
-		&content
-		);
-		
+size_t xPL_MessageIn::printTo(Print& p) const
+{
+	if (_message) return p.print(_message);
+	return 0;
 }
-
-bool xPL_Message::send(bool del){
-	bool r = xPL.sendMessage(*this);
-	if ( del ) { DELETE(this); }
-	return r;
-}
+*/

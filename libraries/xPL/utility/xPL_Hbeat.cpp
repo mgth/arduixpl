@@ -33,44 +33,37 @@ xPL_Hbeat::xPL_Hbeat() {
 	xPL_Hbeat( XPL_HBEAT_INTERVAL );
 }
 
-void xPL_Hbeat::sendHbeat(const prog_char* type,bool configured,const xPL_String* id) {
+void xPL_Hbeat::sendHbeat(const __FlashStringHelper* type,bool configured,const VString* id) {
 
-	xPL_Message msg(S(stat),(configured)?S(hbeat):className(),type);
+
+	xPL_Hbeat_Message msg(*this,(configured)?S(hbeat):className(),type);
 
 	_lastHbeatTime = millis();
 
 	if (id) msg.source.instance = *id;
-
-	if(type != S(end)) msgAddConfigCurrent(msg);
-
-	msg.send();
 	
+	msg.send();
 }
 
+size_t xPL_Hbeat_Message::printContentTo(Print& p) const {	if(schema.instance==S(end)) return 0;	return _hbeat->printConfigCurrent(p);}
 
+size_t xPL_Hbeat::printConfigList(Print& p) {
 
-bool xPL_Hbeat::msgAddConfigList(xPL_Message& msg) {
-	  msg.addOptionKey( S(interval) );
-	  return false;
+	return xPL_Message::printOptionKey(p,S(interval) );
 };
 
-bool xPL_Hbeat::msgAddConfigCurrent(xPL_Message& msg) {
-	msg.addKey(
-			S(interval),
-			new xPL_String((int)intervalMinutes()),
-			true
-		);
+size_t xPL_Hbeat::printConfigCurrent(Print& p) {
 
-	return false;
+	return xPL_Message::printKey(p,S(interval),intervalMinutes() );
 };
 
 bool xPL_Hbeat::configure(xPL_Key& key)
 {
-	if (key == S(interval))
+	if (key.key == S(interval))
 	{
 		//uint16_t val = (uint16_t) ((key.sValue().toInt()));
 
-		setIntervalMinutes( xPL_Int(key.sValue()) );
+		setIntervalMinutes( xPL_Int(key.value) );
 		return true;
 	}
 	return xPL_Schema::configure(key);

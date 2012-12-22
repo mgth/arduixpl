@@ -27,10 +27,9 @@ class xPL_Schema;
 class xPL_Adapter;
 
 #include "utility/xPL_Message.h"
-
 #include "utility/xPL_Node.h"
 
-class xPL_Main:public xPL_Node
+class xPL_Main:public xPL_NodeParent
 {
  private:
 	 
@@ -44,12 +43,12 @@ class xPL_Main:public xPL_Node
 
 	 xPL_Adapter* _adapter;
 	 xPL_Address _source;
-	 xPL_String _oldId;
+	 VString _oldId;
 
 protected:
 
 	virtual bool loop();
-	virtual bool checkTargeted(xPL_Message& msg);
+	virtual bool checkTargeted(xPL_MessageIn& msg);
 
 //configuration
 //EEPROM
@@ -58,21 +57,22 @@ protected:
 	virtual bool storeConfig(xPL_Eeprom& epprom);
 
 //Messages
-	virtual bool msgAddConfigList(xPL_Message& msg);
-	virtual bool msgAddConfigCurrent(xPL_Message& msg);
+	virtual size_t printConfigList(Print& p);
+	virtual size_t printConfigCurrent(Print& p);
 	virtual bool configure(xPL_Key& key);
 
 
 public:
 //id
-	virtual const xPL_String* id() const;
+	virtual const __FlashStringHelper* className() const { return S(xpl); }	
+	virtual const VString* id() const;
 
 	xPL_Main();
 
-	void begin();
+	void begin(const __FlashStringHelper* vendor, const __FlashStringHelper* device, const __FlashStringHelper* instance=NULL);
 
-	virtual bool setId(const xPL_String& id);
-	xPL_String& oldId();
+	virtual bool setId(const VString& id);
+	VString& oldId();
 	xPL_Address& source();
  
 	bool trig(bool& trigger, const bool& b);
@@ -88,7 +88,7 @@ public:
 	void setAdapter(xPL_Adapter* adapter);
 
 
-	bool receivedMessage(char* buffer);
+	bool receivedMessage(VString& buffer);
 	bool sendMessage(xPL_Message& msg); 
  
 	void loopAll();

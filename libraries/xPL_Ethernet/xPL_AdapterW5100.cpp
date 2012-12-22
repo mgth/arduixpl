@@ -1,7 +1,6 @@
 #include "xPL_AdapterW5100.h"
 
 xPL_AdapterW5100 xplAdapter;
-//char xPL_AdapterW5100::_buffer[XPL_BUFFER_SIZE];
 
 bool xPL_AdapterW5100::begin()
 {
@@ -12,25 +11,36 @@ bool xPL_AdapterW5100::begin()
 	}
 	else
 	{
-		Ethernet.begin((uint8_t*)_mac.bin,_ip.bin,INADDR_NONE,INADDR_NONE,_mask.bin);
+		Ethernet.begin(_mac.bin,_ip.bin,INADDR_NONE,INADDR_NONE,_mask.bin);
 	}
 
-#ifdef XPL_DEBUG
-	Serial.print("IP:");
-	Serial.println(_ip);
-#endif
-//	_buffer[0]='\0';
+
+	DBG(F("IP:"),_ip);
+
 	return _udp.begin(XPL_PORT);
 }
 
 bool xPL_AdapterW5100::loop() {
-
-	int len = _udp.parsePacket();
+			
+	size_t len = _udp.parsePacket();
 		
 	if (len)
 	{
-		len = _udp.read(_buffer,sizeof(_buffer));
-		if (len) xPL.receivedMessage(_buffer);     
+		char* buffer = (char*)malloc(len);
+
+		if (buffer)
+		{
+			len = _udp.read(buffer,len);
+		
+			DBG(F("received:"),len);
+
+			if (len)
+			{
+				xPL.receivedMessage(buffer);
+			}
+		}
+
+		free(buffer);
 	}
 	return false;
 }
@@ -38,22 +48,50 @@ bool xPL_AdapterW5100::loop() {
 bool xPL_AdapterW5100::sendMessage(xPL_Message& msg)
 {
 
-	xPL_BufferFiller buf = (byte*)_buffer;
 	
-	buf.print(msg);
 
-#ifdef XPL_DEBUG
-	Serial.println(F("<send>"));
-		msg.printTo(Serial);
-#endif	
+	DBG(F("<send_W5100>"),);
+	DBG(msg,);
+
 	if (connection()) 
 	{
-		uint8_t ip[4]={ 0xFF, 0xFF, 0xFF, 0xFF};
+		//uint8_t ip[4]={ 0xFF, 0xFF, 0xFF, 0xFF};
+
+		IPAddress ip;
+		for (byte i=0;i<4;i++) { ip[i]= (_ip.bin[i]&_mask.bin[i]) | (~_mask.bin[i]); } // TODO : maybe broadcast could be stored
+
+		DBG(F("dest:"),ip);
+
 		_udp.beginPacket(ip, XPL_PORT);
-		_udp.write((uint8_t*)_buffer,buf.position());
-		_udp.endPacket(); 
+
+		//char* buffer = (char*)malloc( VString(msg).len() );
+
+		xPL_BufferFiller buf( VString(msg).len() );
+		msg.printTo(buf);
+
+		_udp.write(buf.buffer(),buf.position());
+		
+#ifdef XPL_DEBUG
+		if (_udp.endPacket())
+		{
+			DBG(F("sent:"),buf.position());
+			return true;
+		}
+		else
+		{
+			DBG(F("err:"),_udp.getWriteError());
+			return false;
+		}
+
+#else
+		return _udp.endPacket();
+#endif
+
 		return true;
 	}
+
+	DBG(F("no connection"),);
+
 	return false;
 }
 

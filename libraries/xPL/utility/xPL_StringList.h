@@ -8,6 +8,7 @@
 	C(target)
 
 	C(test)
+	C(message)
 
 	CF(_vendorid,"arduixpl")
 	CF(_deviceid,"dummy")
@@ -49,6 +50,7 @@
 	C(weight)
 
 	// adapter
+	C(adapter)
 	CF(mac_address,"mac-address")
 	CF(ip_address,"ip-address")
 	CF(ip_mask,"ip-mask")
@@ -84,16 +86,6 @@
 	CF(_one,"1")
 
 	CF(_asterisk,"*")
-
-	//debug
-	C(ArduixPL)
-	C(parse)
-	C(out)
-	C(sent)
-	C(send)
-	C(received)
-	C(mem)
-	C(cost)
 
 	//control
 	C(control)

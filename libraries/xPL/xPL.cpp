@@ -25,31 +25,36 @@
 
 xPL_Main::xPL_Main()
 {
+	_adapter = NULL;
 	_state.oldConfigured = _state.configured = true;
+	_state.trigHbeat = false;
 	_state.deleteGroups = _state.deleteFilters = false;
 	_source.vendor = S(_vendorid);
 	_source.device = S(_deviceid);
 }
 
-const xPL_String* xPL_Main::id() const { return _source.id(); }
+const VString* xPL_Main::id() const { return _source.id(); }
 
-bool xPL_Main::setId(const xPL_String& s)
+bool xPL_Main::setId(const VString& s)
 {
-	_source.instance.moveTo(_oldId);
 	
-	if (_source.instance.load(s)) 
+	_oldId = _source.instance;
+
+	_source.instance = s;
+
+	if (_source.instance.load())
 		return true;
 
-	_oldId.moveTo(_source.instance);
+	_source.instance=_oldId;
 	return false;
 }
 
-	xPL_String& xPL_Main::oldId() { return _oldId; }
+	VString& xPL_Main::oldId() { return _oldId; }
 	xPL_Address& xPL_Main::source() { return _source; }
  
-	bool xPL_Main::trigHbeat(bool b) { bool v=b; _state.trigHbeat = b; return v; }
-	bool xPL_Main::deleteGroups(bool b) { bool v=b; _state.deleteGroups = b; return v; }
-	bool xPL_Main::deleteFilters(bool b) { bool v=b; _state.deleteFilters = b; return v; }
+	bool xPL_Main::trigHbeat(bool b) { bool old=_state.trigHbeat; _state.trigHbeat = b; return old; }
+	bool xPL_Main::deleteGroups(bool b) { bool old=_state.deleteGroups; _state.deleteGroups = b; return old; }
+	bool xPL_Main::deleteFilters(bool b) { bool old=_state.deleteFilters; _state.deleteFilters = b; return old; }
 
 	bool xPL_Main::configured() { return _state.configured; }
 	bool xPL_Main::oldConfigured() { return _state.oldConfigured; }
@@ -62,13 +67,14 @@ bool xPL_Main::setId(const xPL_String& s)
 // EEPROM
 bool xPL_Main::loadConfig(xPL_Eeprom& eeprom)
 {
-	eeprom.readString().moveTo(_source.instance);
+	_source.instance = eeprom.readString();
+	_source.instance.load();
 	return true;
 }
 
 bool xPL_Main::loadDefaultConfig()
 {
-	_source.instance = S(default);
+	//_source.instance = S(default);
 	return true;
 }
 
@@ -89,23 +95,21 @@ bool xPL_Main::storeConfig()
 }
 
 // Messages
-bool xPL_Main::msgAddConfigList(xPL_Message& msg)
+size_t xPL_Main::printConfigList(Print& p)
 {
-	msg.addKey( S(reconf),S(newconf) );
-	return true;
+	return xPL_Message::printKey(p,S(reconf),S(newconf));
 }
 
-bool xPL_Main::msgAddConfigCurrent(xPL_Message& msg)
+size_t xPL_Main::printConfigCurrent(Print& p)
 {
-	msg.addKey( S(newconf),new xPL_String(source().instance),true ); // TODO ??? new ?
-	return true;
+	return xPL_Message::printKey(p,S(newconf),source().instance );
 }
 
 bool xPL_Main::configure(xPL_Key& key)
 {
-	if (key == S(newconf))
+	if (key.key == S(newconf))
 	{
-		xPL_String& value = key.sValue();
+		VString& value = key.value;
 
 		if ( _source.instance == value || setId(value) )
 		{
@@ -125,8 +129,13 @@ void xPL_Main::setConfigured(bool c)
 /************************************************************
  * begin                                                     *
  ************************************************************/
-void xPL_Main::begin() {
+void xPL_Main::begin(const __FlashStringHelper* vendor,const __FlashStringHelper* device,const __FlashStringHelper* instance) {
 	xPL_Eeprom eeprom(3);
+
+	_source.vendor=vendor;
+	_source.device=device;
+	if (instance) _source.instance=instance; else _source.instance=S(default);
+
 
 	// if reset_pin HIGH, config is not loaded
 	pinMode(XPL_RESET_PIN, INPUT);
@@ -134,16 +143,14 @@ void xPL_Main::begin() {
 	if ( eeprom.isxPL() && !digitalRead(XPL_RESET_PIN) )
 	{
 		eeprom.setAddress(3);
-#ifdef XPL_DEBUG
-		Serial.println(("Cfg:EEProm"));
-#endif
+
+		DBG(F("Cfg:EEProm"),);
+
 		sendEvent(&xPL_Node::loadConfig,eeprom);
 	}
 	else
 	{
-#ifdef XPL_DEBUG
-		Serial.println("Cfg:Default");
-#endif
+		DBG(F("Cfg:Default"),);
 		sendEvent(&xPL_Node::loadDefaultConfig);
 	}
 }
@@ -151,7 +158,38 @@ void xPL_Main::begin() {
  * loop                                                     *
  ************************************************************/
 bool xPL_Main::loop() { return true; }
-void xPL_Main::loopAll() { sendEvent(&xPL_Node::loop); }
+void xPL_Main::loopAll() {
+
+#ifdef XPL_SLOWDEBUG
+	class :public xPL_Event {
+	public: 
+		int count;
+		virtual bool send(xPL_Node* n) {
+			Serial.print(F("<"));
+			Serial.print( n->className() );
+			printMemCost(F(" loop>"));
+			//Serial.print(F(" - "));
+			//if (n->id()) Serial.println(*n->id());
+			delay(1000);
+			bool r = n->loop();
+
+			Serial.print(F("<end "));
+			VString(n->className()).printlnTo(Serial,'>');
+			Serial.println();
+
+			printMemCost(F("loop:"));
+			delay(1000);
+			return r;
+		}
+	} evt;
+
+	
+	sendEvent(&evt);
+#else
+	sendEvent(&xPL_Node::loop);
+#endif
+
+}
 
 
 /************************************************************
@@ -169,23 +207,20 @@ bool xPL_Main::sendMessage(xPL_Message& msg) {
  * receivedMessage                                          *
  * Called when an xPL message is received                   *
  ************************************************************/
-bool xPL_Main::receivedMessage(char* buffer) {
+bool xPL_Main::receivedMessage(VString& buffer) {
 
-	xPL_Message msg;
+	xPL_MessageIn msg(buffer);
 
-	if (msg.parseHeader(buffer))
+	if (msg.parseHeader())
 	{
-		#ifdef XPL_DEBUG
-		Serial.print(msg);
-		#endif
+		DBG(msg,);
 
-		if (msg.msgType.msgType()==S(cmnd))
+		if (msg.msgType.instance==S(cmnd))
 		{
-			//sendEvent(&xPL_Node::checkTargeted,msg);
+			sendEvent(&xPL_Node::checkTargeted,msg);
 
 			if(msg.targeted())
 			{
-
 				sendEvent(&xPL_Node::parseMessage,msg,true);
 			
 			}
@@ -197,7 +232,7 @@ bool xPL_Main::receivedMessage(char* buffer) {
 /************************************************************
  * checkTargeted                                            *
  ************************************************************/
-bool xPL_Main::checkTargeted(xPL_Message& msg)
+bool xPL_Main::checkTargeted(xPL_MessageIn& msg)
 {
 	xPL_Address& addr = msg.target;
 	msg.setTargeted(addr.isAny() || addr == source() );

@@ -86,20 +86,20 @@ long xPL_EepromParser::readLong()
 	l += ((long)readInt())<<16;
 	return l;
 }********************************************************************/
-xPL_String xPL_Eeprom::readString(bool step)
+
+VString xPL_Eeprom::readString(bool step)
 {
-	xPL_String s;//xPL_String(XPL_STRING_EEPROM,(char*)_addr); TODO fix it
-	s.set(XPL_STRING_EEPROM,(char*)_addr);
+	VString s = VString(_addr,VSHelperEeprom::helper);
 	s.load();
 	if (step) _addr += s.len()+1;
 	return s;
 }
+
 /********************************************************************
  WRITE
 ********************************************************************/
 size_t xPL_Eeprom::write(uint8_t value)
 {
-//    EEPROM.write(_addr++,value);
 	eeprom_write_byte((unsigned char *) _addr++, value);
 	return 1;
 }
@@ -107,10 +107,10 @@ size_t xPL_Eeprom::write(uint8_t value)
 #ifdef XPL_DEBUG
 void xPL_Eeprom::dumpToSerial()
 {
-	for(int i=0;i<20;i++)
+	for(int i=0;i<1024;i++)
 	{
 		byte val = eeprom_read_byte((unsigned char *)i);
-		Serial.print(val);Serial.print(" - ");
+		Serial.print(val);Serial.print(F(" - "));
 		if (val>32)
 			Serial.println((char) eeprom_read_byte((unsigned char *)i));
 		else 

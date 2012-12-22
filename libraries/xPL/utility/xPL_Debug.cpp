@@ -1,5 +1,5 @@
 #include "xPL_Debug.h"
-#include "xpl_String.h"
+#include "vstring.h"
 
 
 uint8_t * heapptr, * stackptr;
@@ -11,7 +11,7 @@ void check_mem() {
 }
 
 
-int get_free_memory()
+long get_free_memory()
 {
 	check_mem();
 	return stackptr-heapptr;
@@ -26,30 +26,29 @@ int get_free_memory()
 	return free_memory;*/
 }
 
-int printMemCost(char* msg) {
+long printMemCost(const __FlashStringHelper* msg) {
 
-	static int oldMem = XPL_RAM_SIZE;
+	static long oldMem = XPL_RAM_SIZE;
 
-	int newMem = get_free_memory();
+	long newMem = get_free_memory();
 
-	int mem = oldMem - newMem;
+	long mem = oldMem - newMem;
 	if (mem)
 	{
 #ifdef XPL_DEBUG
 		Serial.print(msg);
-		xPL_String(S(mem)).printlnTo(Serial,':');
+		Serial.print(F(" mem:"));
 		Serial.print(oldMem);
 		Serial.print('-');
 		Serial.print(newMem);
-		Serial.print(' ');
-		xPL_String(S(cost)).printlnTo(Serial,':');
+		Serial.print(F(" cost:"));
 		Serial.println(mem);
 #endif
 	}
 	oldMem = newMem;
 	return mem;
 }
-
+/*
 void fix28135_malloc_bug()
  {
    for (__freelist *fp = __flp, *lfp = 0; fp; fp = fp->nx)
@@ -69,4 +68,4 @@ void fix28135_malloc_bug()
 
 
 void   atexit( void ) {}
-
+*/

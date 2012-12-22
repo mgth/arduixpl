@@ -22,14 +22,15 @@
 
 #include "xPL_AdapterENC28J60.h"
 #include <EtherCard.h>
+#include "utility/xPL_Debug.h"
 
 xPL_AdapterENC28J60 xplAdapter;
 
-byte Ethernet::buffer[XPL_BUFFER_SIZE];
+byte Ethernet::buffer[XPL_BUFFER_SIZE+UDP_DATA_P];
 
 bool xPL_AdapterENC28J60::begin()
-{	
-Serial.println("<begin>");
+{
+	DBG(F("<begin ENC28J60>"),);
 
 	_mac.toArray(ether.mymac);
 	ether.begin(sizeof Ethernet::buffer, EtherCard::mymac, ENC28J60_PIN);
@@ -39,16 +40,33 @@ Serial.println("<begin>");
 	{
 		_ip.bin=ether.myip;
 		_mask.bin=ether.mymask;
-
 	}
 	else
-#endif	
+#endif */
 	{
+		
 		_ip.toArray(ether.myip);
 		_mask.toArray(ether.mymask);
-		ether.staticSetup(); }
+		
+/*
+		ether.myip[0]=0xFF;
+		ether.myip[1]=0xFF;
+		ether.myip[2]=0xFF;
+		ether.myip[3]=0xFF;
+		ether.mymask[0]=0x00;
+		ether.mymask[1]=0x00;
+		ether.mymask[2]=0x00;
+		ether.mymask[3]=0x00;
+
+		ether.staticSetup();
+
+		_ip.bin=ether.myip;
+		_mask.bin=ether.mymask;*/
+	}
 
 	ether.enableBroadcast();
+
+	DBG(F("IP: "),_ip);
 
 	return true;
 }
@@ -60,23 +78,21 @@ bool xPL_AdapterENC28J60::connection()
   {
 	  if (!ether.dhcpSetup()) return false;
   }
-#endif
+#endif 
   return true;
 }
 
 
 bool xPL_AdapterENC28J60::loop()
 {
-	return false; //TODO Remove
 	if (!connection()) { return false; }
 
 	word receiveLen = ether.packetReceive();
 	if (!receiveLen) { return false; }
 
-#ifdef XPL_DEBUG
-	Serial.print("received:");
-	Serial.println(receiveLen);
-#endif
+	DBG(F("received:"),receiveLen);
+
+
 #ifdef XPL_HTML_SUPPORT
   word receiveTCP = ether.packetLoop(receiveLen);
 
@@ -106,7 +122,7 @@ bool xPL_AdapterENC28J60::loop()
      ether.buffer[UDP_DST_PORT_H_P] == highByte(XPL_PORT) && 
      ether.buffer[UDP_DST_PORT_L_P] == lowByte(XPL_PORT) ) 
     {
-		Serial.println("<xPL>");
+		DBG(F("<xPL>"),);
 		xPL.receivedMessage((char*)ether.buffer+UDP_DATA_P);
     }
 
@@ -117,30 +133,28 @@ bool xPL_AdapterENC28J60::loop()
 
 bool xPL_AdapterENC28J60::sendMessage(xPL_Message& msg) {
 
-#ifdef XPL_DEBUG
-		Serial.println(F("<send>"));
-		Serial.print(msg);
-#endif	
 
-	ether.udpPrepare(XPL_PORT, ether.myip, XPL_PORT);
-    ether.copyMac(ether.buffer + ETH_SRC_MAC, ether.mymac);
-    for (int i=0;i<6;i++) ether.buffer[ETH_DST_MAC + i] = 0x0FF;
-
-    ether.buffer[IP_TOTLEN_L_P]=0x82;
-    ether.buffer[IP_PROTO_P]=IP_PROTO_UDP_V;
-    for (int i=0;i<4;i++) ether.buffer[IP_DST_P+i] = 0x0FF;
-	
-	xPL_BufferFiller buffer = ether.buffer + UDP_DATA_P;
-
-	buffer.print(msg);
-
+	DBG(F("<send_ENC28J60>"),VString(msg).len());
 	if (connection()) 
 	{
+		ether.udpPrepare(XPL_PORT, ether.myip, XPL_PORT);
+		ether.copyMac(ether.buffer + ETH_SRC_MAC, ether.mymac);
+		for (int i=0;i<6;i++) ether.buffer[ETH_DST_MAC + i] = 0x0FF;
+
+		ether.buffer[IP_TOTLEN_L_P]=0x82;
+		ether.buffer[IP_PROTO_P]=IP_PROTO_UDP_V;
+		for (int i=0;i<4;i++) ether.buffer[IP_DST_P+i] = 0x0FF;
+	
+		xPL_BufferFiller buffer(ether.buffer + UDP_DATA_P);
+
+		buffer.print(msg);
+	
 		ether.udpTransmit(buffer.position());
-#ifdef XPL_DEBUG
-		Serial.print(PSTR("sent:"));
-		Serial.println(buffer.position());
-#endif
+
+		DBG(F("sent:"),buffer.position());
+
+		buffer.unlink();
+
 		return true;
 	}
 	return false;

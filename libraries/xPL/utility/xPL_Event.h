@@ -19,7 +19,7 @@ private:
 
 public:
 	xPL_EventFunction(bool(cls::* func)(),bool(cls::* funcClose)()=NULL) { _func=func; _funcClose=funcClose;  }
-	virtual bool send(xPL_Node* node) { return (((cls*)node)->*_func)(); } 
+	virtual bool send(xPL_Node* node) { return (((cls*)node)->*_func)(); }
 	virtual void close(xPL_Node* node) { if (_funcClose)  (((cls*)node)->*_funcClose)(); } 
 };
 

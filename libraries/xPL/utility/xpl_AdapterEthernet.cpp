@@ -29,6 +29,7 @@
 //char xPL_AdapterEthernet::_buffer[XPL_BUFFER_SIZE]; 
 void xPL_MacAddress::setRandom()
 {
+	randomSeed(analogRead(0));
 	for(byte i=0; i<6; i++) bin[i]=random(256);
 	bin[0]=( bin[0] & B11111110 ) | B00000010;
 }
@@ -56,7 +57,7 @@ int xPL_IpAddress::toArray(uint8_t* ip)
 	return i;
 }
 
-void xPL_IpAddress::fromString(xPL_String &s)
+void xPL_IpAddress::fromString(VString &s)
 {
 	byte i=0;
 	
@@ -88,7 +89,7 @@ size_t xPL_MacAddress::printTo(Print& p) const
 	 }
 	 return len;
 }
-void xPL_MacAddress::fromString(xPL_String &s)
+void xPL_MacAddress::fromString(VString &s)
 {
 	byte i=0;
 	
@@ -99,9 +100,10 @@ void xPL_MacAddress::fromString(xPL_String &s)
 
 	while (c && i<6)
 	{
-		c = s.lowerCharAt(pos);
+		c = s.charAt(pos);
 		if ( c>='0' && c<='9') { val<<=4; val += (char)(c-'0'); }
-		else if (c>='a' && c<='f') { val<<=4; val += (char)(c-'a'+ 10); }
+		else if (c>='a' && c<='f') { val<<=4; val += (char)(c-'a'+ 0xa); }
+		else if (c>='A' && c<='F') { val<<=4; val += (char)(c-'A'+ 0xa); }
 		else { bin[i++]=val; val=0; }
 
 		pos++;
@@ -150,56 +152,44 @@ bool xPL_AdapterEthernet::storeConfig(xPL_Eeprom& eeprom)
 	return true;
 }
 
-bool xPL_AdapterEthernet::msgAddConfigList(xPL_Message& msg) {
-	xPL_Adapter::msgAddConfigList(msg);
+size_t xPL_AdapterEthernet::printConfigList(Print& p) {
+	int l = xPL_Adapter::printConfigList(p);
 
-	msg.addOptionKey( S(mac_address) );
-	msg.addOptionKey( S(ip_address) );
-	msg.addOptionKey( S(ip_mask) );
-	msg.addOptionKey( S(dhcp) );
-	return true;
+	l += xPL_Message::printOptionKey(p, S(mac_address) );
+	l += xPL_Message::printOptionKey(p, S(ip_address) );
+	l += xPL_Message::printOptionKey(p, S(ip_mask) );
+	l += xPL_Message::printOptionKey(p, S(dhcp) );
+	return l;
 };
 
-bool xPL_AdapterEthernet::msgAddConfigCurrent(xPL_Message& msg) {
-	xPL_Adapter::msgAddConfigCurrent(msg);
+size_t xPL_AdapterEthernet::printConfigCurrent(Print& p) {
+	int l= xPL_Adapter::printConfigCurrent(p);
 
-	msg.addKey(
-			S(mac_address),
-			&_mac, 
-			false
-		);
-	msg.addKey(
-			S(ip_address),
-			&_ip, 
-			false
-		);
-	msg.addKey(
-			S(ip_mask),
-			&_mask, 
-			false
-		);
-	msg.addKey( S(dhcp), _dhcp?S(on):S(off) );
-	return true;
+	l += xPL_Message::printKey( p, S(mac_address), &_mac );
+	l += xPL_Message::printKey( p, S(ip_address) , &_ip  );
+	l += xPL_Message::printKey( p, S(ip_mask),     &_mask);
+	l += xPL_Message::printKey( p, S(dhcp), _dhcp?S(on):S(off) );
+	return l;
 };
 
 bool xPL_AdapterEthernet::configure(xPL_Key& key)
 {
-	if (key == S(mac_address))
+	if (key.key == S(mac_address))
 	{
-		_mac.fromString(key.sValue());
+		_mac.fromString(key.value);
 		return true;
 	}
-	else if  (key == S(ip_address))
+	else if  (key.key == S(ip_address))
 	{
-		_ip.fromString(key.sValue());
+		_ip.fromString(key.value);
 	}
-	else if (key == S(ip_address))
+	else if (key.key == S(ip_address))
 	{
-		_mask.fromString(key.sValue());
+		_mask.fromString(key.value);
 	}
-	else if (key == S(dhcp))
+	else if (key.key == S(dhcp))
 	{
-		_dhcp = key.sValue().toBool();
+		_dhcp = key.value.toBool();
 	}
 	return xPL_Adapter::configure(key);
 }

@@ -30,7 +30,6 @@ bool xPL_Config::loadDefaultConfig()
 {
 	_interval = XPL_CONFIG_INTERVAL;
 	xPL.trigHbeat();
-
 	xPL.setConfigured(false);
 	return false;
 }
@@ -38,13 +37,15 @@ bool xPL_Config::loadConfig(xPL_Eeprom& eeprom)
 {
 	xPL_Hbeat::loadConfig(eeprom);
 	xPL.setConfigured(true);
+
+	xPL.trigHbeat();
 	return false;
 }
 
 
 
 
-bool xPL_Config::parseMessage(xPL_Message& msg)
+bool xPL_Config::parseMessage(xPL_MessageIn& msg)
 {
 	if (!targeted(msg)) return false;
 	if ( msg.schema.schType() == S(list) || msg.schema.schType() == S(current) )
@@ -85,7 +86,7 @@ bool xPL_Config::parseMessage(xPL_Message& msg)
 }
 
 
-bool xPL_Config::sendConfig(const prog_char* type) const
+bool xPL_Config::sendConfig(const __FlashStringHelper* type) const
 {
 	xPL_Message msg(S(stat),S(config),type);
 

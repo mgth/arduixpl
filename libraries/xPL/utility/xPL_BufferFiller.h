@@ -24,31 +24,33 @@
 #define XPL_BUFFERFILLER_H
 
 #include "xPL_Define.h"
-#include "xPL_String.h"
+#include "VString.h"
 
 class xPL_BufferFiller : public Print {
   uint8_t *_start, *_ptr;
+
 public:
-  xPL_BufferFiller();
+  xPL_BufferFiller(size_t s);
   xPL_BufferFiller(uint8_t* buf);
+  virtual ~xPL_BufferFiller();
       
   // HTML
 #ifdef XPL_HTML_SUPPORT
-  void printTag(const xPL_String& t,bool close=false) {
+  void printTag(const VString& t,bool close=false) {
 	  print('<');
 	  if (close) print('/');
 	  print(t);
 	  print('>');
   }
 
-  void printTagClose(const xPL_String& t) { printTag(t,true); }
-  void printTagContent_P(const xPL_String& tag, const xPL_String& content)
+  void printTagClose(const VString& t) { printTag(t,true); }
+  void printTagContent_P(const VString& tag, const VString& content)
   {
 	  printTag(tag);
 	  print(content);
 	  printTagClose(tag);
   }
-  void printTagContent(const xPL_String& tag, const xPL_String& content)
+  void printTagContent(const VString& tag, const VString& content)
   {
 	  printTag(tag);
 	  print(content);
@@ -63,6 +65,7 @@ public:
   
   size_t write (uint8_t v);
 
+  void unlink() { _start = _ptr = NULL; }
 
 };
 

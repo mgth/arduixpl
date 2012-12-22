@@ -24,10 +24,18 @@
 
 xPL_Schema::xPL_Schema() {	}
 
-bool xPL_Schema::parseMessage(xPL_Message& msg) { return targeted(msg); }
+bool xPL_Schema::parseMessage(xPL_MessageIn& msg) { return targeted(msg); }
 bool xPL_Schema::configure(xPL_Key& key){return false;}
-bool xPL_Schema::targeted(xPL_Message& msg) { return (msg.schema.schClass()==className()); }
+bool xPL_Schema::targeted(xPL_MessageIn& msg) { return (msg.schema.device==className()); }
 
-void xPL_Schema::reg() { if (!parent()) xPL.addChild(this); }
+void xPL_Schema::reg() {
+#ifdef xPL_Debug
+	if (parent)
+	{
+		Serial.prinntln(F"Schema already registered");
+	} else
+#endif		
+	xPL.addChild(this);
+}
 
 xPL_Schema* xPL_Schema::schema() { return this; }

@@ -27,6 +27,7 @@
 
 #include "xPL_Schema.h"
 
+
 class xPL_Hbeat : public xPL_Schema {
 private:
 
@@ -34,14 +35,13 @@ protected:
   unsigned long _lastHbeatTime;
   uint16_t _interval;
 
-	virtual const prog_char* className() const { return S(hbeat); }	
 	virtual bool loop();
 
-	virtual bool msgAddConfigList(xPL_Message& msg);
-	virtual bool msgAddConfigCurrent(xPL_Message& msg);
+	virtual size_t printConfigList(Print& p);
 	virtual bool configure(xPL_Key& key);
 
 public:	
+	virtual const __FlashStringHelper* className() const { return S(hbeat); }	
 
 
 	xPL_Hbeat(uint16_t interval);
@@ -50,6 +50,7 @@ public:
 	virtual bool loadConfig(xPL_Eeprom& eeprom);
 	virtual bool loadDefaultConfig();
 	virtual bool storeConfig(xPL_Eeprom& eeprom);
+	virtual size_t printConfigCurrent(Print& p);
 
 	void setIntervalMinutes(uint16_t interval){_interval=interval;}
 
@@ -57,8 +58,9 @@ public:
 
 	uint16_t intervalMinutes() const { return _interval;} // TODO : should be able to return decimal value ?
 
-	void sendHbeat(const prog_char* type,bool configured,const xPL_String* id=NULL);
+	void sendHbeat(const __FlashStringHelper* type,bool configured,const VString* id=NULL);
 
 };
 
+class xPL_Hbeat_Message : public xPL_Message {	xPL_Hbeat* _hbeat;public:	xPL_Hbeat_Message(xPL_Hbeat& hbeat, const __FlashStringHelper* schClass, const __FlashStringHelper* schType):xPL_Message(S(stat),schClass,schType)	{		_hbeat =  &hbeat;	}	size_t printContentTo(Print& p) const;};
 #endif

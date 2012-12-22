@@ -3,6 +3,7 @@
 
 #include "xPL_Define.h"
 
+#include "VString.h"
 #include "xPL_String.h"
 #include "xPL_BufferFiller.h"
 #include "xPL_Eeprom.h"
@@ -10,60 +11,78 @@
 class xPL_Main;
 class xPL_Key;
 class xPL_Message;
+class xPL_MessageIn;
 class xPL_Node;
 class xPL_Schema;
 
+#define xPL_NodeParent xPL_Node
 
+#ifndef xPL_NodeParent
+class xPL_NodeParent;
+#endif
 
-class xPL_Node : public xPL_Printable {
-private:
+class xPL_Node : public Printable {
+protected: 
 	xPL_Node* _parent;
 	xPL_Node* _next;
+#ifdef xPL_NodeParent
 	xPL_Node* _child;
-	
-	//int8_t _nextLevel;
-  
-protected:
+#else
+	friend class xPL_NodeParent;
+#endif
+
+
 	virtual bool targeted(xPL_Message& msg) { return false; }
 
 
 public:
 
 // Properties
-	virtual const prog_char* className() const { return S(xpl); }
-	virtual const xPL_String* id() const { return NULL; }
+	virtual const __FlashStringHelper* className() const { return S(xpl); }
+	virtual const VString* id() const { return NULL; }
+
+	xPL_Node* parent() { return _parent; }
+	xPL_Node* next() { return _next; }
 
 // Constructors
-	xPL_Node(){
-	 _parent =  _next = _child = NULL;
-}
 
 
 	virtual ~xPL_Node();
 // Tree
-	xPL_Node* parent() const;
-	xPL_Node* next() const;
-	xPL_Node* child() const;
-	virtual xPL_Schema* schema() { return (parent())?parent()->schema():NULL; }
+	virtual xPL_Schema* schema() { return (_parent)?_parent->schema():NULL; }
 
-	virtual xPL_Node* add(const xPL_String& id) { return NULL; }
+	virtual xPL_Node* add(const VString& id) { return NULL; }
+
+#ifndef xPL_NodeParent
+	xPL_Node():_parent(NULL),_next(NULL) {}
+	virtual xPL_Node* child() { return NULL; }
+	virtual xPL_Node* addChild(xPL_Node* node) { return NULL; }
+	virtual void deleteChilds() {};
+	virtual xPL_Node* defaultChild() const { return NULL; }
+#else
+	xPL_Node():_parent(NULL),_next(NULL),_child(NULL) {}
+	xPL_Node* child() { return _child; }
 	xPL_Node* addChild(xPL_Node* node);
-	xPL_Node* findOrAdd(const xPL_String& id);
-
-	void deleteNode(xPL_Node* previous, bool deleteAll=false);
 	void deleteChilds();
+	xPL_Node* defaultChild() const;
+#endif
 
-	xPL_Node* find(const xPL_String& cmpid);
-	xPL_Node* findChild(const xPL_String& id);
+	xPL_Node* findOrAdd(const VString& id);
+
+	void deleteNode(bool deleteAll=false);
+
+	xPL_Node* find(const VString& cmpid);
+	xPL_Node* findChild(const VString& id);
 
 	xPL_Node* defaultNode() const;
-	xPL_Node* defaultChild() const;
 
 	int count() const;
 
 // events
 
 	void sendEvent(xPL_Event* evt,bool childsOnly=false, bool all=false);
+	void sendEventConst(xPL_Event* evt,bool childsOnly=false, bool all=false) const;
+
 	template<class cls> void sendEvent( bool(cls::*func)(),bool childsOnly=false, bool all=false)
 	{
 		xPL_EventFunction<cls> evt(func);
@@ -92,15 +111,15 @@ public:
 	template<class cls> void sendEventConst( bool(cls::*func)(),bool childsOnly=false, bool all=false) const
 	{
 		xPL_EventFunction<cls> evt(func);
-		return const_cast<xPL_Node*>(this)->sendEvent(&evt,childsOnly,all);
+		return sendEventConst(&evt,childsOnly,all);
 	}
 
 
 	virtual bool loop(){ return true; }
-	virtual bool parseMessage(xPL_Message& msg) { return false; }
-	virtual bool checkTargeted(xPL_Message& msg) { return false; }
+	virtual bool parseMessage(xPL_MessageIn& msg) { return false; }
+	virtual bool checkTargeted(xPL_MessageIn& msg) { return false; }
 
-	void msgAddKey(const xPL_String& key,const xPL_Printable* value, bool alloc=false) const ;
+	void msgAddKey(const VString& key,const VString& value, bool alloc=false) const ;
 
 //Config
 	virtual xPL_Node* readConfig(xPL_Eeprom& eeprom);
@@ -111,12 +130,12 @@ public:
 	virtual bool loadDefaultConfig() { return false; }
 
 	virtual bool configure(xPL_Key& key) { return false; }
-	virtual bool msgAddConfigList(xPL_Message& msg) { return false; }
-	virtual bool msgAddConfigCurrent(xPL_Message& msg) { return false; }
+	virtual size_t printConfigList(Print& p) { return 0; }
+	virtual size_t printConfigCurrent(Print& p) { return 0; }
 //Printable
 	virtual size_t printTo(Print& p) const {
 		if (id()) 
-			return p.print(*id());
+			return id()->printTo(p);
 		else return 0;
 	}
 
@@ -125,12 +144,28 @@ public:
 	void print();
 };
 
-class xPL_ChildsPrinter : xPL_Printable {
+#ifndef xPL_NodeParent
 
-	xPL_Node* _node;
+class xPL_NodeParent: public xPL_Node {
+
+private:
+	xPL_Node* _child;
+public:
+	xPL_NodeParent():_child(NULL) {};
+	virtual xPL_Node* child() { return _child; }
+	virtual void deleteChilds();
+	virtual xPL_Node* addChild(xPL_Node* node);
+	virtual xPL_Node* defaultChild() const;
+
+
+};
+#endif
+class xPL_ChildsPrinter : public Printable {
+
+	const xPL_Node* _node;
 
 public:
-	xPL_ChildsPrinter(xPL_Node& node) { _node=&node; }
+	xPL_ChildsPrinter(const xPL_Node& node) { _node=&node; }
 
 	virtual size_t printTo(Print& p) const {
 
@@ -139,13 +174,13 @@ public:
 			size_t len;
 			Print* print;
 
-			virtual bool send(xPL_Node* n){ len += n->printlnTo(*print); return false; }
+			virtual bool send(xPL_Node* n){ len += print->print(*n); return false; }
 		} evt;
 
 		evt.print=&p;
 		evt.len=0;
 
-		const_cast<xPL_Node*>(_node)->sendEvent(&evt,true);
+		_node->sendEventConst(&evt,true);
 		return evt.len;
 	}
 };

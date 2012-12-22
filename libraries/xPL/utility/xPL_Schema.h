@@ -25,12 +25,12 @@
 
 #include <xPL.h>
 
-class xPL_Schema : public xPL_Node
+class xPL_Schema : public xPL_NodeParent
 {
 protected:
-	virtual bool parseMessage(xPL_Message& msg);
+	virtual bool parseMessage(xPL_MessageIn& msg);
 	virtual bool configure(xPL_Key& key);
-	virtual bool targeted(xPL_Message& msg);
+	virtual bool targeted(xPL_MessageIn& msg);
 	
 public:
 

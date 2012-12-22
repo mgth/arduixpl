@@ -17,39 +17,61 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Aug 31, 2012 by Mathieu GRENET
+	  Modified sept 07, 2012 by Mathieu GRENET
 */
 
-#ifndef XPL_ADAPTERW5100_H
-#define XPL_ADAPTERW5100_H
+#ifndef XPL_ENC28J60_H
+#define XPL_ENC28J60_H
+
 
 #include <xPL.h>
-
-#include <SPI.h>
-#include <Ethernet.h>
-#include <Dhcp.h>
-#include <EthernetUdp.h>
-
-
-#include "utility/xPL_BufferFiller.h"
 #include "utility/xPL_AdapterEthernet.h"
 
-class xPL_AdapterW5100 : public xPL_AdapterEthernet
+class xPL_ENC28J60 : public xPL_AdapterEthernet
 {
 private:
-	EthernetUDP _udp;
-
+protected:
 public:
 	virtual bool begin();
+	
+	virtual bool connection();
+
 	virtual bool loop();
 	virtual bool sendMessage(xPL_Message& msg);
-	virtual bool connection();
 
 #ifdef XPL_HTML_SUPPORT
 	virtual bool sendHomePage(); 
 #endif
+
+
+	byte initialize ();
+	void initSPI ();
+	void enableBroadcast ();
+	void disableBroadcast ();
+
+	word packetReceive();
+	void packetRelease();
+
 };
 
-extern xPL_AdapterW5100 xplAdapter;
+class VSHelperENC28J60 : public VStringHelper
+{
+private:
+//	uint8_t* _ptr;
+protected:
+//	size_t write(uint8_t c);
+
+//	VString from(VString& s);
+	char charAt(const VString& s, size_t pos) const;
+
+public:
+//	VSHelperEeprom():_ptr(NULL) {};
+//	bool setPos(size_t pos) { _ptr = (uint8_t*)pos; return true; }
+	
+	static VSHelperENC28J60 helper;
+};
+
+extern xPL_ENC28J60 xplAdapter;
 
 #endif
+
