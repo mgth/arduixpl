@@ -1,9 +1,9 @@
 
 //#include <EtherCard.h>
-//#include <SPI.h>
-//#include <Ethernet.h>
-//#include <Dhcp.h>
-//#include <EthernetUdp.h>
+#include <SPI.h>
+#include <Ethernet.h>
+#include <Dhcp.h>
+#include <EthernetUdp.h>
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -12,8 +12,8 @@
 //#include <xPL_Config.h>
 #include "utility/xPL_Hbeat.h"
 //#include <xPL_AdapterENC28J60.h>
-#include <xPL_ENC28J60.h>
-//#include <xPL_AdapterW5100.h>
+//#include <xPL_ENC28J60.h>
+#include <xPL_AdapterW5100.h>
 #include <xPL_Sensor.h>
 
 #include <Arduino.h>
@@ -30,8 +30,9 @@ unsigned long lasttime;
 
 void setup()
 {
-  Serial.begin(57600);
-
+#ifdef XPL_DEBUG
+	Serial.begin(57600);
+#endif
   DBG(F("=== boot ===="),);
   DBG_MEM(F("start"));
 

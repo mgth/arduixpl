@@ -1,8 +1,8 @@
 <VisualMicro>
-  <Program Name="xPL_Temperature" Ext=".ino" Location="D:\docs\Arduino\xPL_Temperature">
-    <Compile IsCompiled="0" CompilerErrors="0" ConfigurationName="Debug" StopOnError="True" OptimiseLibs="False" OptimiseCore="False" BuildPath="C:\Users\mathieu\AppData\Local\VMicro\Arduino\Builds\xPL_Temperature\atmega328" />
+  <Program Name="xPL_Temperature" Ext=".ino" Location="D:\docs\arduixpl\xPL_Temperature">
+    <Compile IsCompiled="0" CompilerErrors="0" ConfigurationName="Debug" StopOnError="True" OptimiseLibs="False" OptimiseCore="False" BuildPath="C:\Users\mathieu\AppData\Local\VMicro\Arduino\Builds\xPL_Temperature\mega2560" />
     <Platform Name="Arduino">
-      <Board Name="atmega328" Description="Arduino Duemilanove w/ ATmega328" CoreFolder="D:\docs\Arduino\arduino-1.0.2\hardware\arduino\cores\arduino" VariantFullPath="D:\docs\Arduino\arduino-1.0.2\hardware\arduino\variants\standard" />
+      <Board CoreFolder="D:\docs\arduixpl\arduino-1.0.2.gcc\hardware\arduino\cores\arduino" Name="mega2560" Description="Arduino Mega 2560 or Mega ADK" VariantFullPath="D:\docs\arduixpl\arduino-1.0.2.gcc\hardware\arduino\variants\mega" />
     </Platform>
     <Debug />
   </Program>

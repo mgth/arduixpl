@@ -1,6 +1,6 @@
-//Board = Arduino Duemilanove w/ ATmega328
+//Board = Arduino Mega 2560 or Mega ADK
 #define ARDUINO 102
-#define __AVR_ATmega328P__
+#define __AVR_ATmega2560__
 #define F_CPU 16000000L
 #define __AVR__
 #define __cplusplus
@@ -27,6 +27,6 @@ extern "C" void __cxa_pure_virtual() {}
 //already defined in arduno.h
 //already defined in arduno.h
 
-#include "D:\docs\Arduino\arduino-1.0.2\hardware\arduino\variants\standard\pins_arduino.h" 
-#include "D:\docs\Arduino\arduino-1.0.2\hardware\arduino\cores\arduino\arduino.h"
-#include "D:\docs\Arduino\xPL_Temperature\xPL_Temperature.ino"
+#include "D:\docs\arduixpl\arduino-1.0.2.gcc\hardware\arduino\variants\mega\pins_arduino.h" 
+#include "D:\docs\arduixpl\arduino-1.0.2.gcc\hardware\arduino\cores\arduino\arduino.h"
+#include "D:\docs\arduixpl\xPL_Temperature\xPL_Temperature.ino"
