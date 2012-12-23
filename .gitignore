@@ -11,7 +11,16 @@
 *.lai
 *.la
 *.a
+
+#visual files
+*.sdf
+*.sln
+*.suo
+*.vcxproj
+*.vcxproj.filters
+Debug
+Visual Micro/*
+
 xPL_TouchSwitch
 xPL_Lighting_test
-xPL_Sensor
 xPL_Lighting
