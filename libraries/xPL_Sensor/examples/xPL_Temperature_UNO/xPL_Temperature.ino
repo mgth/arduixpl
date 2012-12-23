@@ -1,9 +1,24 @@
+/*
+  ArduixPL - xPL for arduino
+  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
 
-//#include <EtherCard.h>
-#include <SPI.h>
-#include <Ethernet.h>
-#include <Dhcp.h>
-#include <EthernetUdp.h>
+  This file is part of ArduixPL.
+
+    ArduixPL is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    ArduixPL is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
+
+	  Modified Dec 23, 2012 by Mathieu GRENET
+*/
 
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -11,9 +26,8 @@
 #include <xPL.h>
 //#include <xPL_Config.h>
 #include "utility/xPL_Hbeat.h"
-//#include <xPL_AdapterENC28J60.h>
-//#include <xPL_ENC28J60.h>
-#include <xPL_AdapterW5100.h>
+#include <xPL_ENC28J60.h>
+
 #include <xPL_Sensor.h>
 
 #include <Arduino.h>

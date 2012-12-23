@@ -19,7 +19,7 @@
 *.vcxproj
 *.vcxproj.filters
 Debug
-Visual Micro/*
+Visual Micro
 
 xPL_TouchSwitch
 xPL_Lighting_test
