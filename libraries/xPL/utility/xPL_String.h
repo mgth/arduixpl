@@ -17,8 +17,9 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified 30 Oct, 2012 by Mathieu GRENET
+	  Modified Dec 23, 2012 by Mathieu GRENET
 */
+
 /********************************************************************Here goes all string constants, it may reduce rom size a bit, might be a betterway to handle that*/#ifndef xPL_StringS_H#define xPL_StringS_H#include "xPL_Define.h"#include <avr/pgmspace.h>
 
 #if !defined(pgm_get_far_address)

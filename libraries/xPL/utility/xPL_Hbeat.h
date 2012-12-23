@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified 23 Mars 2012 by Mathieu GRENET
+	  Modified Dec 23, 2012 by Mathieu GRENET
 */
 
 #ifndef xPL_HBEAT_H

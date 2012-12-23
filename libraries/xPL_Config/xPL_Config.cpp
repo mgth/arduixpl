@@ -17,8 +17,9 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Apr 17, 2012 by Mathieu GRENET
+	  Modified Dec 23, 2012 by Mathieu GRENET
 */
+
 #include "xPL_Config.h"
 
 xPL_Config xplConfig;

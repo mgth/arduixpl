@@ -17,8 +17,15 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified sept 07, 2012 by Mathieu GRENET
+	  Modified Dec 23, 2012 by Mathieu GRENET
 */
+// Many parts derived from:
+//      EHTERSHIELD_H library for Arduino etherShield
+//      Copyright (c) 2008 Xing Yu.  All right reserved. (this is LGPL v2.1)
+// enc28j60 and ip code (which is GPL v2)
+//      Author: Pascal Stang 
+//      Modified by: Guido Socher
+//      DHCP code: Andrew Lindsay
 
 #ifndef XPL_ENC28J60_H
 #define XPL_ENC28J60_H
