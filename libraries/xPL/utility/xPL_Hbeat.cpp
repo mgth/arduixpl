@@ -35,26 +35,23 @@ xPL_Hbeat::xPL_Hbeat() {
 
 void xPL_Hbeat::sendHbeat(const __FlashStringHelper* type,bool configured,const VString* id) {
 
-
-	xPL_Hbeat_Message msg(*this,(configured)?S(hbeat):className(),type);
+	xPL_Hbeat_Message msg(*this);
 
 	_lastHbeatTime = millis();
 
-	if (id) msg.source.instance = *id;
-	
 	msg.send();
 }
 
-size_t xPL_Hbeat_Message::printContentTo(Print& p) const {	if(schema.instance==S(end)) return 0;	return _hbeat->printConfigCurrent(p);}
+size_t xPL_Hbeat_Message::printContentTo(Print& p) const {	return ((xPL_Hbeat*)_node)->printConfigCurrent(p);}size_t xPL_HbeatEnd_Message::printContentTo(Print& p) const { return 0; }
 
 size_t xPL_Hbeat::printConfigList(Print& p) {
 
-	return xPL_Message::printOptionKey(p,S(interval) );
+	return xPL_Message::printOptionKeyTo(p,S(interval) );
 };
 
 size_t xPL_Hbeat::printConfigCurrent(Print& p) {
 
-	return xPL_Message::printKey(p,S(interval),intervalMinutes() );
+	return xPL_Message::printKeyTo(p,S(interval),(int)intervalMinutes() );
 };
 
 bool xPL_Hbeat::configure(xPL_Key& key)
@@ -85,6 +82,19 @@ bool xPL_Hbeat::loop() {
 	return false;
 }
 
+bool xPL_Hbeat::parseMessage(xPL_MessageIn& msg)
+{
+	if (!targeted(msg)) return false;
+	if ( msg.schema.instance == S(request) )
+	{
+		if (msg.key_command() == S(request))
+		{
+			xPL.trigHbeat();
+		}
+	}
+	
+	return false;
+}
 /*****************************************
 EEPROM
 *****************************************/

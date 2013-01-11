@@ -23,13 +23,13 @@ protected:
 	size_t write(uint8_t c) {return 0;}
 
 	virtual VString from(VString& s);
-	virtual char charAt(const VString& s, size_t pos) const=0;
+	virtual char charAt(size_t pos, const VString& s) const=0;
 	virtual size_t len(const VString& s) const;
 	virtual size_t rawlen(const VString& s) const;
-	virtual size_t printTo(const VString& s,Print& p) const;
+	virtual size_t printTo(Print& p, const VString& s) const;
 	virtual void destruct(VString& s) const {};
-	virtual void copyTo(const VString& sFrom,VString& sTo) const;
-	virtual void moveTo(VString& sFrom,VString& sTo) const;
+	virtual void copyTo(VString& sTo, const VString& sFrom) const;
+	virtual void moveTo(VString& sTo, VString& sFrom) const;
 
 	friend class VString;
 };
@@ -38,7 +38,7 @@ class VSHelperNone : public VStringHelper
 {
 protected:
 	size_t write(uint8_t c) {return 0;}
-	char charAt(const VString& s, size_t pos) const {return '\0';}
+	char charAt(size_t pos, const VString& s) const {return '\0';}
 	size_t rawlen(const VString& s) const {return 0;}
 
 public:
@@ -49,7 +49,7 @@ class VSHelperRam : public VStringHelper
 {
 protected:
 	size_t write(uint8_t c);
-	char charAt(const VString& s, size_t pos) const;
+	char charAt(size_t pos, const VString& s) const;
 	size_t rawlen(const VString& s) const;
 
 public:
@@ -61,7 +61,7 @@ public:
 class VSHelperFlash : public VStringHelper
 {
 protected:
-	char charAt(const VString& s, size_t pos) const;
+	char charAt(size_t pos, const VString& s) const;
 	size_t rawlen(const VString& s) const;
 public:
 	static VSHelperFlash helper;
@@ -70,8 +70,8 @@ public:
 class VSHelperRamAlloc : public VSHelperRam
 {
 protected:
-	virtual void copyTo(const VString& sFrom,VString& sTo) const;
-	virtual void moveTo(VString& sFrom,VString& sTo) const;
+	virtual void copyTo(VString& sTo, const VString& sFrom) const;
+	virtual void moveTo(VString& sTo, VString& sFrom) const;
 	VString from(VString& s);
 	void destruct(VString& s) const;
 public:
@@ -86,7 +86,7 @@ protected:
 	size_t write(uint8_t c);
 
 	VString from(VString& s);
-	char charAt(const VString& s, size_t pos) const;
+	char charAt(size_t pos, const VString& s) const;
 
 public:
 	VSHelperEeprom():_ptr(NULL) {};
@@ -98,8 +98,8 @@ public:
 class VSHelperPrintable : public VStringHelper
 {
 protected:
-	char charAt(const VString& s, size_t pos) const;
-	size_t printTo(const VString& s, Print& p) const;
+	char charAt(size_t pos, const VString& s) const;
+	size_t printTo(Print& p, const VString& s) const;
 	size_t rawlen(const VString& s) const;
 public:
 	static VSHelperPrintable helper;
@@ -130,7 +130,7 @@ class VString
 	 VString(size_t addr,const VStringHelper& h) { _addr=addr; setHelper(h); _len=rawLen(); }
 	 VString(const VString& s) { setAddr(s.addr()); _helperIdx=s._helperIdx; _len=s._len; }
 
-	 size_t printTo(Print& p) const { return (_len)?helper().printTo(*this,p):0; }
+	 size_t printTo(Print& p) const { return (_len)?helper().printTo(p,*this):0; }
 	
 	 size_t printlnTo(Print&p, char ln='\n') const { return printTo(p) + p.print(ln); }
 	 size_t printNzTo(Print& p) const { return (_len)?printTo(p):0; }	 size_t printlnNzTo(Print& p, char ln='\n') const { return (_len)?printlnTo(p,ln):0; }
@@ -139,7 +139,7 @@ class VString
 
 	 char charAt(size_t pos) const {
 		 if(pos>=len()) return '\0';
-		 return helper().charAt(*this,pos);
+		 return helper().charAt(pos, *this);
 	 }
 	 void setLen(size_t len) { _len=len; }
 
@@ -173,12 +173,12 @@ class VString
 		 *this = to(VSHelperRamAlloc::helper); 
 		 return true;
 	 }
-/*
+
 	VString & operator = (const VString &rhs);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
 	VString & operator = (VString &&rval);
 	#endif
-	*/ 	 bool operator==(const VString& s) const;	 bool operator!=(const VString& s) const { return !operator==(s); }	 operator bool() { return _len!=0; }
+	 	 bool operator==(const VString& s) const;	 bool operator!=(const VString& s) const { return !operator==(s); }	 operator bool() { return _len!=0; }
 
 	 ~VString() { destruct(); }
 

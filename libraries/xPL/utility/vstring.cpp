@@ -39,31 +39,35 @@ size_t VStringHelper::len(const VString& s) const {return s._len;}
 
 size_t VStringHelper::rawlen(const VString& s) const
 {
-	size_t i=0;	for(;;)	{		if (!charAt(s,i)) break;		i++;	}	return i;}
+	size_t i=0;	for(;;)	{		if (!charAt(i,s)) break;		i++;	}	return i;}
 
-size_t VStringHelper::printTo(const VString& s,Print& p) const {
+size_t VStringHelper::printTo(Print& p, const VString& s) const {
 		size_t i=0;		for(;;)		{			char c = s.charAt(i);			if (!c) break;			p.print(c);			i++;		}		return i;	
 }
-void VStringHelper::copyTo(const VString& sFrom,VString& sTo) const { sTo._addr = sFrom._addr; sTo._helper=sFrom._helper; sTo._len=sFrom._len; }
-void VStringHelper::moveTo(VString& sFrom,VString& sTo) const { copyTo(sFrom,sTo); }
+void VStringHelper::copyTo(VString& sTo, const VString& sFrom) const { sTo.setAddr(sFrom.addr()); sTo.setHelper(sFrom.helper()); sTo.setLen(sFrom.len()); }
+void VStringHelper::moveTo(VString& sTo, VString& sFrom) const { copyTo(sTo, sFrom); }
 
 /********************************************************************
 Helper:ram
 ********************************************************************/
-char VSHelperRam::charAt(const VString& s, size_t pos) const { return ((char*)s.addr())[pos] ; }
+char VSHelperRam::charAt(size_t pos, const VString& s) const { return ((char*)s.addr())[pos] ; }
 size_t VSHelperRam::rawlen(const VString& s) const {return strlen((char*)s.addr()); }
 size_t VSHelperRam::write(uint8_t c) {*printPtr++ = c ; return 1;}
 
 /********************************************************************
 Helper:ramAlloc
 ********************************************************************/
-void VSHelperRamAlloc::copyTo(const VString& sFrom,VString& sTo) const
+void VSHelperRamAlloc::copyTo(VString& sTo, const VString& sFrom) const
 {
-	VStringHelper::copyTo(sFrom,sTo);
+	VStringHelper::copyTo(sTo, sFrom);
 	sTo.load();
 }
 
-void VSHelperRamAlloc::moveTo(VString& sFrom,VString& sTo) const { VStringHelper::copyTo(sFrom,sTo); }
+void VSHelperRamAlloc::moveTo(VString& sTo, VString& sFrom) const {
+	VStringHelper::copyTo(sTo, sFrom);
+	sFrom.setLen(0);
+	sFrom.setAddr((char*)NULL);
+}
 
 VString VSHelperRamAlloc::from(VString& sFrom)
 { 
@@ -80,14 +84,14 @@ VString VSHelperRamAlloc::from(VString& sFrom)
 }
 
 void VSHelperRamAlloc::destruct(VString& s) const {
-	free((void*)s.addr());
+	//free((void*)s.addr());
 	s.setAddr((char*)NULL);
 }
 
 /********************************************************************
 Helper:flash
 ********************************************************************/
-char VSHelperFlash::charAt(const VString& s, size_t pos) const {
+char VSHelperFlash::charAt(size_t pos, const VString& s) const {
 	return pgm_read_byte((char*)s.addr()+pos);
 }
 size_t VSHelperFlash::rawlen(const VString& s) const {return strlen_P((char*)s.addr()); }
@@ -95,7 +99,7 @@ size_t VSHelperFlash::rawlen(const VString& s) const {return strlen_P((char*)s.a
 /********************************************************************
 Helper:eeprom
 ********************************************************************/
-char VSHelperEeprom::charAt(const VString& s, size_t pos) const { return eeprom_read_byte(((unsigned char*)s.addr())+pos); }
+char VSHelperEeprom::charAt(size_t pos, const VString& s) const { return eeprom_read_byte(((unsigned char*)s.addr())+pos); }
 
 VString VSHelperEeprom::from(VString& sFrom)
 {
@@ -113,10 +117,10 @@ size_t VSHelperEeprom::write(uint8_t c) {
 /********************************************************************
 Helper:printable
 ********************************************************************/
-size_t VSHelperPrintable::printTo(const VString& s,Print& p) const {
+size_t VSHelperPrintable::printTo(Print& p, const VString& s) const {
 	return ((Printable*)s.addr())->printTo(p);
 }
-char VSHelperPrintable::charAt(const VString& s, size_t pos) const {
+char VSHelperPrintable::charAt(size_t pos, const VString& s) const {
 	class :public Print { size_t write(uint8_t c) { return 1; } } p;
 
 	return s.printTo(p);
@@ -166,12 +170,12 @@ VString VString::parseTo(char c) {
 		
 		return VString(0,0,*_helper[_helperIdx]);
 }
-/*
+
 VString & VString::operator = (const VString &rhs)
 {
 	if (this == &rhs) return *this;
 	
-	rhs.helper().copyTo(rhs,*this);
+	rhs.helper().copyTo(*this,rhs);
 	
 	return *this;
 }
@@ -179,11 +183,11 @@ VString & VString::operator = (const VString &rhs)
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 VString & VString::operator = (String &&rval)
 {
-	if (this != &rval) rval.helper().moveTo(*this);
+	if (this != &rval) rval.helper().moveTo(*this,rval);
 	return *this;
 }
 #endif
-*/
+
 bool VString::operator==(const VString& s) const {	size_t i=0;	for (;;)	{		char c = charAt(i);		if (s.charAt(i)!=c) return false;		if (!c) return true;		i++;	}}bool VString::toBool() const {
 
 	if (

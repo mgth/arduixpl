@@ -33,6 +33,16 @@
 #define XPL_DEBUG
 #define XPL_DEBUG_MEM
 
+#ifdef XPL_DEBUG
+#define XPL_SETUP() void setup() { Serial.begin(57600);
+#define XPL_LOOP() } void loop()
+#define XPL_END ;
+#else
+#define XPL_SETUP() int main(void) {
+#define XPL_LOOP() while(1)
+#define XPL_END }
+#endif
+
 #define ENC28J60_PIN 10
 
 #define XPL_DHCP 

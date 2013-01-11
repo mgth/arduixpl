@@ -54,7 +54,7 @@ xPL_Node* xPL_NodeParent::addChild( xPL_Node* node)
 
 xPL_Node* xPL_Node::find(const VString& cmpid) {
 
-	if ( id() && (*id() == cmpid) ) return this;
+	if ( id() == cmpid ) return this;
 	if (_next) return _next->find(cmpid);
 	return NULL;
 }
@@ -130,6 +130,6 @@ bool xPL_Node::loadConfig(xPL_Eeprom& eeprom)
 	return false;
 }
 
-bool xPL_Node::storeConfig(xPL_Eeprom& eeprom) { id()->printlnTo(eeprom,'\0'); return true;}
+bool xPL_Node::storeConfig(xPL_Eeprom& eeprom) { id().printlnTo(eeprom,'\0'); return true;}
 
 void xPL_Node::storeConfigClose(xPL_Eeprom& eeprom) { eeprom.write('\0'); }

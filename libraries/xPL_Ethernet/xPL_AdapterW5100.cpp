@@ -27,6 +27,8 @@ xPL_AdapterW5100 xplAdapter;
 
 bool xPL_AdapterW5100::begin()
 {
+	
+#ifdef XPL_DHCP
 	if (_dhcp && Ethernet.begin(_mac.bin))
 	{
 		_ip.bin = Ethernet.localIP();
@@ -36,7 +38,11 @@ bool xPL_AdapterW5100::begin()
 	{
 		Ethernet.begin(_mac.bin,_ip.bin,INADDR_NONE,INADDR_NONE,_mask.bin);
 	}
+#else
+	for (byte i=0;i<4;i++) { _ip.bin[i] = 0;_mask.bin[i] = 0; }
+	Ethernet.begin(_mac.bin,_ip.bin,INADDR_NONE,INADDR_NONE,_mask.bin);
 
+#endif
 
 	DBG(F("IP:"),_ip);
 

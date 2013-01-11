@@ -41,9 +41,7 @@ public:
 	xPL_Key(const VString& key,const VString&  value):key(key),value(value) { }
 
 	//properties
-	virtual const VString* id() const { return &key; }
-
-
+	virtual const VString id() const { return key; }
 
 	bool sendEventConfigure();
 
@@ -52,7 +50,7 @@ public:
 
 };
 
-// xPL_ListId : provide a way to print coma separeted Id list of a node's childs
+// xPL_ListId : provide a way to print coma separated Id list of a node's childs
 class xPL_ListId: public xPL_Printable {
 private:
 	const xPL_Node* _node;
@@ -67,7 +65,7 @@ public:
 
 			virtual bool send(xPL_Node* n) {
 				if (n->next()) len += print->print(',');
-				if (n->id()) len += n->id()->printTo(*print);
+				len += n->id().printTo(*print);
 				return false;
 			} 
 		} evt ;
@@ -83,6 +81,7 @@ public:
 
 class xPL_Address: public Printable {
 public:
+
 	VString vendor;
 	VString device;
 	VString instance;
@@ -92,55 +91,36 @@ public:
 
 	virtual size_t printTo(Print& p) const;
 
-
-	const VString* id() const { return &instance; }
-
 	void setAny() { instance=S(_asterisk); vendor.clear(); device.clear(); }
 	bool isAny() { return instance.charAt(0)=='*'; } 
 
 	bool operator==(const xPL_Address& addr);
 };
 
-class xPL_String_Index : public Printable {
-private:
-	const __FlashStringHelper* _key;
-	int _index;
-public:
-	virtual size_t printTo(Print& p) const;
 
-	xPL_String_Index(const __FlashStringHelper* key, int index)
-	{
-		_key=key;
-		_index = index;
-	}
 
-};
-
-class xPL_Message : public xPL_NodeParent {
-public:
-	xPL_Address msgType;
-	byte hop;
-	xPL_Address source;
-	xPL_Address target;
-	xPL_Address schema;
-
+class xPL_Message : public Printable  {
+protected:	xPL_Node* _node;public:
 	xPL_Message() {};
-	xPL_Message(const __FlashStringHelper*  msgType, const __FlashStringHelper* schClass, const __FlashStringHelper* schType);
+	xPL_Message(xPL_Node& node);
 
-	static size_t printKey(Print& p, const VString& key,const VString& value);
-	static size_t printKey(Print& p, const VString& key,const Printable& value);
-	static size_t printKey(Print& p, const VString& key,int value);
-	static size_t printOptionKey(Print& p, const __FlashStringHelper* value);
-	static size_t printOptionKey(Print& p, const __FlashStringHelper* value,int index);
+	static size_t printKeyTo(Print& p, const VString& key);
+	static size_t printKeyTo(Print& p, const VString& key,const VString& value);
+	static size_t printKeyTo(Print& p, const VString& key,const Printable& value);
+	static size_t printKeyTo(Print& p, const VString& key,int value);
+	static size_t printKeyTo(Print& p, const VString& key,float value,int dec=2);
+	static size_t printOptionKeyTo(Print& p, const __FlashStringHelper* value);
+	static size_t printOptionKeyTo(Print& p, const __FlashStringHelper* value,int index);
 
-	bool send(bool del=false);
+	bool send();
 
 	virtual size_t printTo(Print& p) const;
 	virtual size_t printContentTo(Print& p) const;
-};
+	virtual size_t printTargetTo(Print& p) const { return p.print('*'); }
+	virtual const __FlashStringHelper* msgType() const { return S(stat); }	virtual const __FlashStringHelper* schClass() const;	virtual const __FlashStringHelper* schType() const { return S(basic); }};
 
 
-class xPL_MessageIn : public xPL_Message {
+class xPL_MessageIn : public xPL_NodeParent {
 private:
 	VString _message;
 	VString _input;
@@ -152,6 +132,12 @@ private:
 	} _state;
 
 public:
+	xPL_Address msgType;
+	byte hop;
+	xPL_Address source;
+	xPL_Address target;
+	xPL_Address schema;
+
 	xPL_MessageIn(VString& buffer);
 
 	void setTargeted(bool b=true )  { _state.targeted=b; }

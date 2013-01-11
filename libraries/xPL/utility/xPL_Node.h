@@ -61,11 +61,16 @@ public:
 
 // Properties
 	virtual const __FlashStringHelper* className() const { return S(xpl); }
-	virtual const VString* id() const { return NULL; }
+	virtual const VString id() const { return VString(); }
 
-	xPL_Node* parent() { return _parent; }
+	xPL_Node* parent() const { return _parent; }
 	xPL_Node* next() { return _next; }
-
+	xPL_Node* nextLoop() { return (_next)?_next:_parent->_child; }
+	xPL_Node* prevLoop() { 
+		xPL_Node* n = _parent->_child;
+		while(n->nextLoop()!=this) n=nextLoop();
+		return n;
+	}
 // Constructors
 
 
@@ -156,9 +161,7 @@ public:
 	virtual size_t printConfigCurrent(Print& p) { return 0; }
 //Printable
 	virtual size_t printTo(Print& p) const {
-		if (id()) 
-			return id()->printTo(p);
-		else return 0;
+			return id().printTo(p);
 	}
 
 //Debug

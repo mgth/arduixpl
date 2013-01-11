@@ -74,10 +74,6 @@ size_t xPL_Address::printTo(Print& p) const {
 	return len;
 }
 
-size_t xPL_String_Index::printTo(Print& p) const {
-	return xPL_Printable::emit_p(p, PSTR("&[$]"),_key,&_index);
-}
-
 void xPL_Address::parse(const VString& s) {
 	vendor = s;
 	instance = vendor.parseTo('.');
@@ -92,6 +88,7 @@ void xPL_Address::parse(const VString& s) {
 }
 
 bool xPL_Address::operator==(const xPL_Address& addr) {
+
 	if ( instance != addr.instance ) return false;
 	if ( device != addr.device ) return false;
 	if ( vendor != addr.vendor ) return false;
@@ -101,48 +98,47 @@ bool xPL_Address::operator==(const xPL_Address& addr) {
 /********************************************************************
 xPL_Message
 ********************************************************************/
-xPL_Message::xPL_Message(const __FlashStringHelper* mType,const __FlashStringHelper* sClass,const __FlashStringHelper* sType)
-{
-	msgType.vendor = S(xpl);
-	msgType.instance = mType;
+xPL_Message::xPL_Message(xPL_Node& node) { _node = &node; }
 
-	hop=1;
-	
-	source = xPL.source();
-	
-	target.setAny();
-	
-	schema.device = sClass;
-	schema.instance = sType;
-}
+const __FlashStringHelper*  xPL_Message::schClass() const { return _node->schema()->className(); }
 
-size_t xPL_Message::printKey(Print&p, const VString& key,int value) {
-	return
-	key.printlnNzTo(p,'=') +
-	p.print(value) +
-	p.print('\n');
+size_t xPL_Message::printKeyTo(Print&p, const VString& key) {
+	return key.printlnNzTo(p,'=');
 }
-size_t xPL_Message::printKey(Print&p, const VString& key,const Printable& value) {
+size_t xPL_Message::printKeyTo(Print&p, const VString& key,float value,int dec) {
 	return
-	key.printlnNzTo(p,'=') +
-	p.print(value) +
+	printKeyTo(p,key) +
+	p.print(value,dec) +
 	p.print('\n');
 }
 
-size_t xPL_Message::printKey(Print&p, const VString& key,const VString& value) {
+size_t xPL_Message::printKeyTo(Print&p, const VString& key,int value) {
 	return
-	key.printlnNzTo(p,'=') +
-	value.printlnNzTo(p);
+	printKeyTo(p,key) +
+	p.print(value) +
+	p.print('\n');
+}
+size_t xPL_Message::printKeyTo(Print&p, const VString& key,const Printable& value) {
+	return
+	printKeyTo(p,key) +
+	p.print(value) +
+	p.print('\n');
 }
 
-size_t xPL_Message::printOptionKey(Print&p, const __FlashStringHelper* value) {
-	return printKey(p,S(option),value);
+size_t xPL_Message::printKeyTo(Print&p, const VString& key,const VString& value) {
+	return
+	printKeyTo(p,key) +
+	value.printlnTo(p);
 }
 
-size_t xPL_Message::printOptionKey(Print&p, const __FlashStringHelper* value,int index)
+size_t xPL_Message::printOptionKeyTo(Print&p, const __FlashStringHelper* value) {
+	return printKeyTo(p,S(option),value);
+}
+
+size_t xPL_Message::printOptionKeyTo(Print&p, const __FlashStringHelper* value,int index)
 {
 	return
-	VString(S(option)).printlnTo(p,'=') +
+	printKeyTo(p,S(option)) +
 	VString(value).printlnTo(p,'[') +
 	p.print(index) +
 	p.print(F("]\n"));
@@ -152,16 +148,21 @@ size_t xPL_Message::printTo(Print& p) const //710
 {
   int len=0;
 
- len += p.print(msgType);
- len += p.print(F("\n{\n"));
- len += printKey(p,S(hop),hop);
- len += printKey(p,S(source),source);
- len += printKey(p,S(target),target);
- len += p.print(F("}\n"));
- len += p.print(schema);
+ len += p.print(F("xpl-"));
+ len += p.print(msgType());
+ len += p.print(F("\n{\nhop=1\n"));
+// len += printKey(p,S(hop),hop);
+ len += printKeyTo(p,S(source),xPL.source());
+ len += printKeyTo(p,S(target)); len += printTargetTo(p);
+// len += printKey(p,S(target),target);
+ len += p.print(F("\n}\n"));
+ len += p.print(schClass());
+ len += p.print('.');
+ len += p.print(schType());
  len += p.print(F("\n{\n"));
  len += printContentTo(p);
- len += p.print(F("}"));
+ //len += p.print(F("}"));
+ len += p.print(F("}\n")); // domogik and xplhal manager won't receive messages that do not end with \n
 
  return len;
 /*
@@ -195,10 +196,8 @@ xPL_ChildsPrinter content(*this);
 size_t xPL_Message::printContentTo(Print& p) const {	return 0;	//	return xPL_ChildsPrinter(*this).printTo(p);}
 
 
-bool xPL_Message::send(bool del){
-	bool r = xPL.sendMessage(*this);
-	if ( del ) { DELETE(this); }
-	return r;
+bool xPL_Message::send(){
+	return xPL.sendMessage(*this);
 }
 
 /********************************************************************

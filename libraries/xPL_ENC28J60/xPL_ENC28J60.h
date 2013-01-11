@@ -69,7 +69,7 @@ protected:
 //	size_t write(uint8_t c);
 
 //	VString from(VString& s);
-	char charAt(const VString& s, size_t pos) const;
+	char charAt(size_t pos, const VString& s) const;
 
 public:
 //	VSHelperEeprom():_ptr(NULL) {};

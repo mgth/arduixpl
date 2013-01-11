@@ -66,7 +66,7 @@ protected:
 public:
 //id
 	virtual const __FlashStringHelper* className() const { return S(xpl); }	
-	virtual const VString* id() const;
+	virtual const VString id() const;
 
 	xPL_Main();
 

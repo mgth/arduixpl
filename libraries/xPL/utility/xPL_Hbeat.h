@@ -39,6 +39,7 @@ protected:
 
 	virtual size_t printConfigList(Print& p);
 	virtual bool configure(xPL_Key& key);
+	virtual bool parseMessage(xPL_MessageIn& msg);
 
 public:	
 	virtual const __FlashStringHelper* className() const { return S(hbeat); }	
@@ -62,5 +63,5 @@ public:
 
 };
 
-class xPL_Hbeat_Message : public xPL_Message {	xPL_Hbeat* _hbeat;public:	xPL_Hbeat_Message(xPL_Hbeat& hbeat, const __FlashStringHelper* schClass, const __FlashStringHelper* schType):xPL_Message(S(stat),schClass,schType)	{		_hbeat =  &hbeat;	}	size_t printContentTo(Print& p) const;};
+class xPL_Hbeat_Message : public xPL_Message {public:	xPL_Hbeat_Message(xPL_Hbeat& hbeat):xPL_Message(hbeat) {};	size_t printContentTo(Print& p) const;};class xPL_HbeatEnd_Message : public xPL_Message {public:	xPL_HbeatEnd_Message(xPL_Hbeat& hbeat):xPL_Message(hbeat) {};	size_t printContentTo(Print& p) const;	virtual const __FlashStringHelper* schType() const { return S(end); }};
 #endif

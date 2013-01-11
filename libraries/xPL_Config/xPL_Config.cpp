@@ -48,7 +48,7 @@ bool xPL_Config::loadConfig(xPL_Eeprom& eeprom)
 
 bool xPL_Config::parseMessage(xPL_MessageIn& msg)
 {
-	if (!targeted(msg)) return false;
+	if (!targeted(msg)) return xPL_Hbeat::parseMessage(msg);
 	if ( msg.schema.schType() == S(list) || msg.schema.schType() == S(current) )
 	{
 		if (msg.key_command() == S(request))

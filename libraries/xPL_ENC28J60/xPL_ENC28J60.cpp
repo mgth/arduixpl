@@ -756,7 +756,7 @@ void xPL_ENC28J60::packetRelease() {
 }
 
 
-char VSHelperENC28J60::charAt(const VString& s, size_t pos) const {
+char VSHelperENC28J60::charAt(size_t pos, const VString& s) const {
 	writeReg(ERDPT, s.addr()+pos);
 	return readByte();
 }

@@ -33,7 +33,7 @@ xPL_Main::xPL_Main()
 	_source.device = S(_deviceid);
 }
 
-const VString* xPL_Main::id() const { return _source.id(); }
+const VString xPL_Main::id() const { return _source.instance; }
 
 bool xPL_Main::setId(const VString& s)
 {
@@ -97,12 +97,12 @@ bool xPL_Main::storeConfig()
 // Messages
 size_t xPL_Main::printConfigList(Print& p)
 {
-	return xPL_Message::printKey(p,S(reconf),S(newconf));
+	return xPL_Message::printKeyTo(p,S(reconf),S(newconf));
 }
 
 size_t xPL_Main::printConfigCurrent(Print& p)
 {
-	return xPL_Message::printKey(p,S(newconf),source().instance );
+	return xPL_Message::printKeyTo(p,S(newconf),source().instance );
 }
 
 bool xPL_Main::configure(xPL_Key& key)

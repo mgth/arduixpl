@@ -156,20 +156,20 @@ bool xPL_AdapterEthernet::storeConfig(xPL_Eeprom& eeprom)
 size_t xPL_AdapterEthernet::printConfigList(Print& p) {
 	int l = xPL_Adapter::printConfigList(p);
 
-	l += xPL_Message::printOptionKey(p, S(mac_address) );
-	l += xPL_Message::printOptionKey(p, S(ip_address) );
-	l += xPL_Message::printOptionKey(p, S(ip_mask) );
-	l += xPL_Message::printOptionKey(p, S(dhcp) );
+	l += xPL_Message::printOptionKeyTo(p, S(mac_address) );
+	l += xPL_Message::printOptionKeyTo(p, S(ip_address) );
+	l += xPL_Message::printOptionKeyTo(p, S(ip_mask) );
+	l += xPL_Message::printOptionKeyTo(p, S(dhcp) );
 	return l;
 };
 
 size_t xPL_AdapterEthernet::printConfigCurrent(Print& p) {
 	int l= xPL_Adapter::printConfigCurrent(p);
 
-	l += xPL_Message::printKey( p, S(mac_address), &_mac );
-	l += xPL_Message::printKey( p, S(ip_address) , &_ip  );
-	l += xPL_Message::printKey( p, S(ip_mask),     &_mask);
-	l += xPL_Message::printKey( p, S(dhcp), _dhcp?S(on):S(off) );
+	l += xPL_Message::printKeyTo( p, S(mac_address), &_mac );
+	l += xPL_Message::printKeyTo( p, S(ip_address) , &_ip  );
+	l += xPL_Message::printKeyTo( p, S(ip_mask),     &_mask);
+	l += xPL_Message::printKeyTo( p, S(dhcp), _dhcp?S(on):S(off) );
 	return l;
 };
 

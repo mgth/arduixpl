@@ -133,7 +133,7 @@ protected:
 	virtual byte dec() const { return 0; }
 
 	size_t printTo(Print& p) const {
-		return printDecTo(2,p);
+		return p.print(_val,2);
 	}
 public:
 	xPL_Float() { _val=0.0; }
@@ -141,6 +141,7 @@ public:
 	xPL_Float(float f) { _val=f; }
 
 	operator float() { return _val; }
+	float toFloat() { return _val; }
 	xPL_Float& operator=(float val) { _val = val; return *this;}
 	bool operator<(float val) { return (_val < val);}
 	bool operator>(float val) { return (_val > val);}
