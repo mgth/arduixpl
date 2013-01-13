@@ -23,6 +23,8 @@
 #ifndef XPL_DEFINE_H
 #define XPL_DEFINE_H
 
+#include "../xPL_Setup.h"
+
 #define GCC_VERSION (__GNUC__ * 10000 \
                      + __GNUC_MINOR__ * 100 \
                      + __GNUC_PATCHLEVEL__)
@@ -30,8 +32,6 @@
 //#undef PROGMEM
 //#define PROGMEM __attribute__((section(".progmem.data")))
 
-#define XPL_DEBUG
-#define XPL_DEBUG_MEM
 
 #ifdef XPL_DEBUG
 #define XPL_SETUP() void setup() { Serial.begin(57600);
@@ -42,17 +42,6 @@
 #define XPL_LOOP() while(1)
 #define XPL_END }
 #endif
-
-#define ENC28J60_PIN 10
-
-#define XPL_DHCP 
-//#define XPL_FLOAT
-
-#define XPL_CONFIG_INTERVAL 1
-#define XPL_HBEAT_INTERVAL 5
-
-// xPL default port, do not change
-#define XPL_PORT 3865
 
 #if defined(RAMSIZE)
 #define XPL_RAM_SIZE RAMSIZE

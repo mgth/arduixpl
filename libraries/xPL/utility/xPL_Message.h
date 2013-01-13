@@ -61,9 +61,9 @@ public:
 		class :public xPL_Event {
 		public:
 			Print* print;
-			size_t len;
+			mutable size_t len;
 
-			virtual bool send(xPL_Node* n) {
+			virtual bool send(xPL_Node* n) const {
 				if (n->next()) len += print->print(',');
 				len += n->id().printTo(*print);
 				return false;
@@ -73,7 +73,7 @@ public:
 		evt.print=&p;
 		evt.len=0;
 
-		_node->sendEventConst(&evt,true);
+		_node->sendEventConst(evt,true);
 
 		return evt.len;
 	}

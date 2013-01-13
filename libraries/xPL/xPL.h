@@ -88,7 +88,11 @@ public:
 
 	void setAdapter(xPL_Adapter* adapter);
 
+	bool attachInterrupt(int8_t pin, int mode);
+	bool detachInterrupt(int8_t pin);
 
+	static void xplInterrupt(uint8_t pin);
+#if defined (__AVR_ATmega328P__)|| defined(__AVR_ATmega168P__) || defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)	static void xplInterrupt0();	static void xplInterrupt1();#endif#if defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__) || (__AVR_ATmega32U4__)	static void xplInterrupt2();	static void xplInterrupt3();#endif#if defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)	static void xplInterrupt4();	static void xplInterrupt5();#endif
 	bool receivedMessage(VString& buffer);
 	bool sendMessage(xPL_Message& msg); 
  

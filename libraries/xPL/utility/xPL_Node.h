@@ -107,30 +107,30 @@ public:
 
 // events
 
-	void sendEvent(xPL_Event* evt,bool childsOnly=false, bool all=false);
-	void sendEventConst(xPL_Event* evt,bool childsOnly=false, bool all=false) const;
+	void sendEvent(const xPL_Event& evt,bool childsOnly=false, bool all=false);
+	void sendEventConst(const xPL_Event& evt,bool childsOnly=false, bool all=false) const;
 
 	template<class cls> void sendEvent( bool(cls::*func)(),bool childsOnly=false, bool all=false)
 	{
 		xPL_EventFunction<cls> evt(func);
-		return sendEvent(&evt,childsOnly,all);
+		return sendEvent(evt,childsOnly,all);
 	}
 	template<class cls,class clsparam> void sendEvent( bool(cls::*func)(clsparam&),clsparam& param, bool childsOnly=false, bool all=false)
 	{
 		xPL_EventFunctionParam<cls,clsparam> evt(func,param);
-		return sendEvent(&evt,childsOnly,all);
+		return sendEvent(evt,childsOnly,all);
 	}
 
 	template<class cls> void sendEvent( bool(cls::*func)(),bool(cls::*funcClose)(),bool childsOnly=false, bool all=false)
 	{
 		xPL_EventFunction<cls> evt(func,funcClose);
-		return sendEvent(&evt,childsOnly,all);
+		return sendEvent(evt,childsOnly,all);
 	}
 
 	template<class cls,class clsparam> void sendEvent( bool(cls::*func)(clsparam&),clsparam& param,bool(cls::*funcClose)(clsparam&),bool childsOnly=false, bool all=false)
 	{
 		xPL_EventFunctionParam<cls,clsparam> evt(func,funcClose);
-		return sendEvent(&evt,childsOnly,all);
+		return sendEvent(evt,childsOnly,all);
 	}
 
 
@@ -138,13 +138,15 @@ public:
 	template<class cls> void sendEventConst( bool(cls::*func)(),bool childsOnly=false, bool all=false) const
 	{
 		xPL_EventFunction<cls> evt(func);
-		return sendEventConst(&evt,childsOnly,all);
+		return sendEventConst(evt,childsOnly,all);
 	}
 
 
 	virtual bool loop(){ return true; }
 	virtual bool parseMessage(xPL_MessageIn& msg) { return false; }
 	virtual bool checkTargeted(xPL_MessageIn& msg) { return false; }
+
+	virtual bool interrupt(uint8_t pin, unsigned long time) { return true; }
 
 	void msgAddKey(const VString& key,const VString& value, bool alloc=false) const ;
 
@@ -196,16 +198,16 @@ public:
 
 		class :public xPL_Event {
 		public:
-			size_t len;
+			mutable size_t len;
 			Print* print;
 
-			virtual bool send(xPL_Node* n){ len += print->print(*n); return false; }
+			virtual bool send(xPL_Node* n) const { len += print->print(*n); return false; }
 		} evt;
 
 		evt.print=&p;
 		evt.len=0;
 
-		_node->sendEventConst(&evt,true);
+		_node->sendEventConst(evt,true);
 		return evt.len;
 	}
 };

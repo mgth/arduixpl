@@ -42,14 +42,14 @@ bool xPL_Key::sendEventConfigure() {
 		class :public xPL_Event {
 		public:
 			xPL_Key* key;
-			virtual bool send(xPL_Node* n) { return n->configure(*key); } 
+			virtual bool send(xPL_Node* n) const { return n->configure(*key); } 
 		} evt;
 
 		evt.key = this;
 
 		DBG(F("parse:"),*this);
 
-		xPL.sendEvent(&evt);
+		xPL.sendEvent(evt);
 		return false;
 }
 

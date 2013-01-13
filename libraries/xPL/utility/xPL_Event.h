@@ -30,8 +30,8 @@ class xPL_Message;
 
 class xPL_Event {
 public:
-	virtual bool send(xPL_Node* n)=0;
-	virtual void close(xPL_Node* n) { }
+	virtual bool send(xPL_Node* n) const =0;
+	virtual void close(xPL_Node* n) const { }
 };
 
 template <class cls> class xPL_EventFunction:public xPL_Event {
@@ -41,8 +41,8 @@ private:
 
 public:
 	xPL_EventFunction(bool(cls::* func)(),bool(cls::* funcClose)()=NULL) { _func=func; _funcClose=funcClose;  }
-	virtual bool send(xPL_Node* node) { return (((cls*)node)->*_func)(); }
-	virtual void close(xPL_Node* node) { if (_funcClose)  (((cls*)node)->*_funcClose)(); } 
+	virtual bool send(xPL_Node* node) const { return (((cls*)node)->*_func)(); }
+	virtual void close(xPL_Node* node) const { if (_funcClose)  (((cls*)node)->*_funcClose)(); } 
 };
 
 template <class cls,class clsparam> class xPL_EventFunctionParam:public xPL_Event {
@@ -58,9 +58,17 @@ public:
 		_funcClose=funcClose; 
 		_param = &param;
 	}
-	virtual bool send(xPL_Node* node) { return (((cls*)node)->*_func)(*_param); } 
-	virtual void close(xPL_Node* node) { if (_funcClose)  (((cls*)node)->*_funcClose)(*_param); } 
+	virtual bool send(xPL_Node* node) const { return (((cls*)node)->*_func)(*_param); } 
+	virtual void close(xPL_Node* node) const { if (_funcClose)  (((cls*)node)->*_funcClose)(*_param); } 
 };
 
+class xPL_EventInterrupt:public xPL_Event
+{
+	uint8_t _pin;
+	unsigned long _time;
 
+public:
+	xPL_EventInterrupt(uint8_t pin,unsigned long time):_pin(pin),_time(time) {}
+	virtual bool send(xPL_Node* node) const;
+};
 #endif

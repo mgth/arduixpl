@@ -23,3 +23,4 @@
 #include "xPL_Event.h"
 #include "xPL_Node.h"
 
+bool xPL_EventInterrupt::send(xPL_Node* node) const { return node->interrupt(_pin,_time); } 

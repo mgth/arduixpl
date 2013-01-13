@@ -16,6 +16,7 @@
 
 #include <Wire.h>
 #include <xPL_SensorBMP085.h>
+#include <xPL_SensorUltrasonic.h>
 
 #include <Arduino.h>
 
@@ -41,6 +42,9 @@ void setup()
 
 	xplSensor.addChild(new xPL_SensorDHT(6, 11, F("dht11t"), F("dht11h")));
 	xplSensor.addChild(new xPL_SensorBMP085(F("bmp085t"), F("bmp085p")));
+
+	xplSensor.addChild(new xPL_SensorUltrasonic(5,2,S(distance)));
+
 	lasttime=millis();
 }
 

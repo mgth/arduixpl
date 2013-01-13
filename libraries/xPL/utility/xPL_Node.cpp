@@ -64,12 +64,12 @@ xPL_Node* xPL_Node::findChild(const VString& id) { if (child()) return child()->
 int xPL_Node::count() const {
 	class :public xPL_Event {
 	public: 
-		int count;
-		virtual bool send(xPL_Node* n) { count++; return false; }
+		mutable int count;
+		virtual bool send(xPL_Node* n) const { count++; return false; }
 	} evt;
 
 	evt.count=0;
-	const_cast<xPL_Node*>(this)->sendEvent(&evt,true);
+	const_cast<xPL_Node*>(this)->sendEvent(evt,true);
 	return evt.count;
 }
 
@@ -96,16 +96,16 @@ void xPL_NodeParent::deleteChilds()
 	_child=NULL;
 }
 
-void xPL_Node::sendEvent ( xPL_Event* evt, bool childsOnly, bool all)
+void xPL_Node::sendEvent (const xPL_Event& evt, bool childsOnly, bool all)
 {
 	if (all && _next) { _next->sendEvent(evt,childsOnly,all);}
-	if (childsOnly || evt->send(this))
+	if (childsOnly || evt.send(this))
 	{ 
 		if (child()) child()->sendEvent(evt,false,true);
-		evt->close(this);
+		evt.close(this);
 	}
 }
-void xPL_Node::sendEventConst ( xPL_Event* evt, bool childsOnly, bool all) const
+void xPL_Node::sendEventConst (const xPL_Event& evt, bool childsOnly, bool all) const
 {
 	const_cast<xPL_Node*>(this)->sendEvent(evt,childsOnly,all);
 }
