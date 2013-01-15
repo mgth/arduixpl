@@ -3,6 +3,8 @@
 #include <Ethernet.h>
 #include <Dhcp.h>
 #include <EthernetUdp.h>
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
 
 
 #include <xPL.h>
@@ -51,7 +53,7 @@ void setup()
 void loop()
 {
 
-	xPL.loopAll();
+	xPL.loop();
 	
 //	DBG(F("time"),millis()-lasttime);
 //	lasttime=millis();
