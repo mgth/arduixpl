@@ -32,32 +32,22 @@ xPL_Key::xPL_Key(VString&  buffer)
 }
 
 void xPL_Key::parse(VString& buffer)
-{
-	key = buffer;
-	buffer = key.parseTo('\n');
-	value = key.parseTo('=');
+{ 
+//	printMemLCD(); delay(1000);
+
+	id = buffer;
+
+	buffer = id.parseTo('\n');
+
+	value = id.parseTo('=');
 }
 
-bool xPL_Key::sendEventConfigure() {
-		class :public xPL_Event {
-		public:
-			xPL_Key* key;
-			virtual bool send(xPL_Node* n) const { return n->configure(*key); } 
-		} evt;
-
-		evt.key = this;
-
-		DBG(F("parse:"),*this);
-
-		xPL.sendEvent(evt);
-		return false;
-}
 
 size_t xPL_Key::printTo(Print& p) const {
 
 	size_t len = 0;
 
-	len += key.printlnNzTo(p,'=');
+	len += id.printlnNzTo(p,'=');
 	len += value.printNzTo(p);
 
 	return len;
@@ -100,7 +90,11 @@ xPL_Message
 ********************************************************************/
 xPL_Message::xPL_Message(xPL_Node& node) { _node = &node; }
 
-const __FlashStringHelper*  xPL_Message::schClass() const { return _node->schema()->className(); }
+const __FlashStringHelper*  xPL_Message::schClass() const {
+	if (_node && _node->schema() )
+		return _node->schema()->className();
+	return S(message);
+}
 
 size_t xPL_Message::printKeyTo(Print&p, const VString& key) {
 	return key.printlnNzTo(p,'=');
@@ -152,7 +146,7 @@ size_t xPL_Message::printTo(Print& p) const //710
  len += p.print(msgType());
  len += p.print(F("\n{\nhop=1\n"));
 // len += printKey(p,S(hop),hop);
- len += printKeyTo(p,S(source),xPL.source());
+ len += printKeyTo(p,S(source)); len += xPL.source().printTo(p); len += p.print('\n');
  len += printKeyTo(p,S(target)); len += printTargetTo(p);
 // len += printKey(p,S(target),target);
  len += p.print(F("\n}\n"));
@@ -223,7 +217,7 @@ xPL_Key* xPL_MessageIn::getKey(const __FlashStringHelper* name)
 {
 	if (parseContent())
 	{
-		return (xPL_Key*)findChild(name);
+		return (xPL_Key*)_keys.findChild(name);
 	}
 	return NULL;
 }
@@ -239,11 +233,11 @@ VString xPL_MessageIn::getValue(const __FlashStringHelper* s)
 xPL_Key* xPL_MessageIn::getKeyCopy(const __FlashStringHelper* name)
 {
 		xPL_Key* k= new xPL_Key();
-		k->key = name;
-		if (_parent)
+		if(k)
 		{
-			k->value = ((xPL_MessageIn*)_parent)->getValue(name);
-			k->value.load();
+			k->id = name;
+			k->value = getValue(name);
+				k->value.load();
 		}
 		return k;
 }
@@ -255,27 +249,25 @@ bool xPL_MessageIn::parseHeader() {
 	  END, ERROR, MSG_TYPE, SCHEMA_NAME, START_SECTION, IN_SECTION
      } state = MSG_TYPE;
 
-//	_state.contentParsed = true;
-
 	xPL_Key k;
 
 	do
 	{
 		k.parse(_input);
-		if (!k.key) { state=ERROR; }
-		char c = k.key.charAt(0);
+		if (!k.id) { state=ERROR; }
+		char c = k.id.charAt(0);
 
 		switch(state)
 		{
 			case MSG_TYPE:
-				msgType.parse(k.key); 
+				msgType.parse(k.id); 
 				if (msgType.vendor == S(xpl))
 					state=START_SECTION;
 				else
 					state=ERROR;
 				break;
 			case SCHEMA_NAME:
-				schema.parse(k.key); 
+				schema.parse(k.id); 
 				state=END;
 				break;
 			case START_SECTION:
@@ -285,13 +277,13 @@ bool xPL_MessageIn::parseHeader() {
 				if (c=='}') { state=SCHEMA_NAME; }
 				else
 				{
-						if ( k.key == S(hop) ) {
+						if ( k.id == S(hop) ) {
 							hop=xPL_Int(k.value);
 						}
-						else if ( k.key == S(source) ) {
+						else if ( k.id == S(source) ) {
 							source.parse(k.value);
 						}
-						else if ( k.key == S(target) ) {
+						else if ( k.id == S(target) ) {
 							target.parse(k.value);
 						}
 				}
@@ -307,20 +299,21 @@ bool xPL_MessageIn::parseHeader() {
 
 bool xPL_MessageIn::parseContent() //390
 {
+	xPL_Key k;
+
 	if (_state.contentParsed) return true; //14
 
      enum {
 	  END, ERROR, START_SECTION, IN_SECTION
      } state = START_SECTION;
-
-	xPL_Key* k;
 	
 	do 
 	{
-		k = new xPL_Key(_input); //278
-		if (!k) { state=ERROR; } //12
+		k.parse(_input); //278
 
-		char c = k->key.charAt(0);
+		if (!k.id) { state=ERROR; } //12
+
+		char c = k.id.charAt(0);
 
 		switch(state)
 		{
@@ -333,15 +326,12 @@ bool xPL_MessageIn::parseContent() //390
 					state=END;
 				}
 				else {
-					addChild(k);
-					k=NULL;
+					if (!_keys.addChild(new xPL_Key(k))) state=ERROR;
 				}
 				break;
 			case END: break;
 			case ERROR: break;
 		}
-
-		if (k) { DELETE(k); } //30
 
 	} while(state>ERROR);
 

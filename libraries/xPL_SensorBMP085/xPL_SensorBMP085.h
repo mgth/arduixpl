@@ -10,6 +10,6 @@
 #endif
 
 #include "utility/BMP085.h"#include "../xPL_Sensor/xPL_Sensor.h"#include "../xPL/utility/VString.h"class xPL_SensorBMP085:public xPL_NodeParent {
-BMP085 _bmp085;int _pin;unsigned long _time; byte _type;xPL_SensorTemp _temp;xPL_SensorPressure _pressure;public:	xPL_SensorBMP085(const VString & tName, const VString & hName);	virtual bool parseMessage(xPL_MessageIn& msg) { return true; }	virtual bool loop();};
+BMP085 _bmp085;int _pin;unsigned long _time; byte _type;xPL_SensorTemp _temp;xPL_SensorPressure _pressure;public:	xPL_SensorBMP085(const VString & tName, const VString & hName);	virtual void parseMessage(xPL_MessageIn& msg) { sendParseMessage(msg); }	virtual void loop();};
 #endif
 

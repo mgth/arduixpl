@@ -17,31 +17,34 @@ typedef byte vsHelperIndex;
 
 class VString;
 
+class nullPrinter : public Print {
+		size_t write(uint8_t w) { return 1; }
+};
+
 class VStringHelper : public Print
 {
 protected:
 	size_t write(uint8_t c) {return 0;}
 
+public:
 	virtual VString from(VString& s);
 	virtual char charAt(size_t pos, const VString& s) const=0;
-	virtual size_t len(const VString& s) const;
+//	virtual size_t len(const VString& s) const;
 	virtual size_t rawlen(const VString& s) const;
 	virtual size_t printTo(Print& p, const VString& s) const;
 	virtual void destruct(VString& s) const {};
 	virtual void copyTo(VString& sTo, const VString& sFrom) const;
 	virtual void moveTo(VString& sTo, VString& sFrom) const;
-
-	friend class VString;
 };
 
 class VSHelperNone : public VStringHelper
 {
 protected:
 	size_t write(uint8_t c) {return 0;}
+public:
 	char charAt(size_t pos, const VString& s) const {return '\0';}
 	size_t rawlen(const VString& s) const {return 0;}
 
-public:
 	static VSHelperNone helper;
 };
 
@@ -49,10 +52,10 @@ class VSHelperRam : public VStringHelper
 {
 protected:
 	size_t write(uint8_t c);
+public:
 	char charAt(size_t pos, const VString& s) const;
 	size_t rawlen(const VString& s) const;
 
-public:
 	static VSHelperRam helper;
 
 	char* printPtr;
@@ -61,20 +64,20 @@ public:
 class VSHelperFlash : public VStringHelper
 {
 protected:
+public:
 	char charAt(size_t pos, const VString& s) const;
 	size_t rawlen(const VString& s) const;
-public:
 	static VSHelperFlash helper;
 };
 
 class VSHelperRamAlloc : public VSHelperRam
 {
 protected:
+public:
 	virtual void copyTo(VString& sTo, const VString& sFrom) const;
 	virtual void moveTo(VString& sTo, VString& sFrom) const;
 	VString from(VString& s);
 	void destruct(VString& s) const;
-public:
 		static VSHelperRamAlloc helper;
 };
 
@@ -85,10 +88,10 @@ private:
 protected:
 	size_t write(uint8_t c);
 
+public:
 	VString from(VString& s);
 	char charAt(size_t pos, const VString& s) const;
 
-public:
 	VSHelperEeprom():_ptr(NULL) {};
 	bool setPos(size_t pos) { _ptr = (uint8_t*)pos; return true; }
 	
@@ -98,14 +101,14 @@ public:
 class VSHelperPrintable : public VStringHelper
 {
 protected:
+public:
 	char charAt(size_t pos, const VString& s) const;
 	size_t printTo(Print& p, const VString& s) const;
 	size_t rawlen(const VString& s) const;
-public:
 	static VSHelperPrintable helper;
 };
 
-class VString
+class VString //: public Printable
 {
  protected:
 	vsHelperIndex _helperIdx;
@@ -134,7 +137,7 @@ class VString
 	
 	 size_t printlnTo(Print&p, char ln='\n') const { return printTo(p) + p.print(ln); }
 	 size_t printNzTo(Print& p) const { return (_len)?printTo(p):0; }	 size_t printlnNzTo(Print& p, char ln='\n') const { return (_len)?printlnTo(p,ln):0; }
-	 size_t len() const { return helper().len(*this); }
+	 size_t len() const { return _len; /*return helper().len(*this);*/ }
 	 size_t rawLen() const { return helper().rawlen(*this); }
 
 	 char charAt(size_t pos) const {

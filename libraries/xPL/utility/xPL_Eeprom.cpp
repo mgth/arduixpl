@@ -33,10 +33,17 @@ void xPL_Eeprom::setAddress(unsigned int addr) { _addr=addr; }
 /********************************************************************
  INIT
 ********************************************************************/
-
+//Todo cache isXPL value;
 bool xPL_Eeprom::isxPL()
 {
-	return 
+	// TODO : enable eeprom config when ok
+
+	return false;
+
+pinMode(XPL_RESET_PIN, INPUT);
+
+return 
+		!digitalRead(XPL_RESET_PIN) &&
 		eeprom_read_byte( (unsigned char*)0 )=='x' &&
 		eeprom_read_byte( (unsigned char*)1 )=='P' &&
 		eeprom_read_byte( (unsigned char*)2 )=='L';

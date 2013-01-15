@@ -68,13 +68,12 @@ protected:
 
 //configuration
 //EEPROM
-	virtual bool loadConfig(xPL_Eeprom& eeprom);
-	virtual bool loadDefaultConfig();
-	virtual bool storeConfig(xPL_Eeprom& eeprom);
+	virtual void loadConfig(xPL_Eeprom& eeprom);
+	virtual void storeConfig(xPL_Eeprom& eeprom);
 //Messages
 	virtual size_t printConfigList(Print& p);
 	virtual size_t printConfigCurrent(Print& p);
-	virtual bool configure(xPL_Key& key);
+	virtual void configure(xPL_Key& key);
 
 public:
 	virtual bool connection() =0;

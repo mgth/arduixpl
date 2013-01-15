@@ -21,6 +21,8 @@
 */
 
 #include "vstring.h"
+#include "xPL_Define.h"
+
 
 const VStringHelper** VString::_helper = NULL;
 vsHelperIndex VString::_helperCount = 0;
@@ -35,7 +37,7 @@ VSHelperPrintable VSHelperPrintable::helper;
 
 VString VStringHelper::from(VString& s) {return s;}
 
-size_t VStringHelper::len(const VString& s) const {return s._len;}
+//size_t VStringHelper::len(const VString& s) const {return s._len;}
 
 size_t VStringHelper::rawlen(const VString& s) const
 {
@@ -44,7 +46,13 @@ size_t VStringHelper::rawlen(const VString& s) const
 size_t VStringHelper::printTo(Print& p, const VString& s) const {
 		size_t i=0;		for(;;)		{			char c = s.charAt(i);			if (!c) break;			p.print(c);			i++;		}		return i;	
 }
-void VStringHelper::copyTo(VString& sTo, const VString& sFrom) const { sTo.setAddr(sFrom.addr()); sTo.setHelper(sFrom.helper()); sTo.setLen(sFrom.len()); }
+void VStringHelper::copyTo(VString& sTo, const VString& sFrom) const
+{
+	sTo.setAddr(sFrom.addr());
+	sTo.setHelper(sFrom.helper());
+	sTo.setLen(sFrom.len());
+}
+
 void VStringHelper::moveTo(VString& sTo, VString& sFrom) const { copyTo(sTo, sFrom); }
 
 /********************************************************************
@@ -118,7 +126,9 @@ size_t VSHelperEeprom::write(uint8_t c) {
 Helper:printable
 ********************************************************************/
 size_t VSHelperPrintable::printTo(Print& p, const VString& s) const {
-	return ((Printable*)s.addr())->printTo(p);
+	if (s.addr())
+		return ((Printable*)s.addr())->printTo(p);
+	return 0;
 }
 char VSHelperPrintable::charAt(size_t pos, const VString& s) const {
 	class :public Print { size_t write(uint8_t c) { return 1; } } p;
@@ -127,9 +137,7 @@ char VSHelperPrintable::charAt(size_t pos, const VString& s) const {
 }
 size_t VSHelperPrintable::rawlen(const VString& s) const {
 
-	class :public Print {
-		size_t write(uint8_t w) { return 1; /*(w='\x0d')?0:1;*/ }
-	  } p;
+	nullPrinter p;
 
 	return s.printTo(p);
 }
@@ -160,15 +168,15 @@ VString VString::parseTo(char c) {
 
 	size_t pos = 0;
 	size_t l = len();
-
 		while(charAt(pos)!=c && (pos<l)) pos++;
 
 		setLen(pos);
 		pos++;
+
 		if (pos<l)
-			return VString(addr(pos),l - pos,*_helper[_helperIdx]);
+			return VString(addr(pos),l - pos,helper());
 		
-		return VString(0,0,*_helper[_helperIdx]);
+		return VString();
 }
 
 VString & VString::operator = (const VString &rhs)

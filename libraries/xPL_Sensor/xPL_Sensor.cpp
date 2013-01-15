@@ -24,16 +24,12 @@
 xPL_SchemaSensor xplSensor;
 
 
-xPL_Sensor_Message::xPL_Sensor_Message(xPL_Sensor& sensor,const VString& request):xPL_Message(sensor){	if (request==S(current)) _request=current;	else if (request==S(name)) _request=name;	else _request=none;}size_t xPL_Sensor_Message::printContentTo(Print& p) const {	size_t l = 0;	l += printKeyTo(p,S(device),_node->id());	l += printKeyTo(p,S(type),_node->className());	switch(_request) {	case current:		l += ((xPL_Sensor*)_node)->printCurrentTo(p);		break;	case name:		l += printKeyTo(p,S(name),_node->id());		break;	default:		break;	}	return l;}xPL_SensorGeneric::xPL_SensorGeneric(const VString& name):xPL_Sensor(name) {	_threshold=0.1;	_status.reset=true;}size_t xPL_SensorGeneric::printCurrentTo(Print& p) const{	size_t l=0;	l += xPL_Message::printKeyTo(p,S(current),_currentValue);	l += xPL_Message::printKeyTo(p,S(lowest),_lowestValue);	l += xPL_Message::printKeyTo(p,S(highest),_highestValue);	l += xPL_Message::printKeyTo(p,S(units),units()); 	_publicValue=_currentValue;	return l;}/*void xPL_SensorGeneric::setValue(float v) {	_currentValue=v;	if (_status.reset || _highestValue<v) _highestValue=v;	if ( _status.reset || _lowestValue>v) _lowestValue=v;	_status.reset=false;	if (abs((float)_currentValue-(float)_publicValue)>=_threshold )	{		xPL_Sensor_MessageTrig(*this).send();
-	}}*/void xPL_SensorGeneric::setValue(float v) {	if (_buffer.size())	{/*		if (_buffer.setValue(v))			_currentValue=_buffer.avg();		else return;*/		_buffer.setValue(v);		_currentValue = _buffer.getMax();	}	else _currentValue=v;	if (_status.reset || _highestValue <_currentValue) _highestValue=_currentValue;	if ( _status.reset || _lowestValue >_currentValue) _lowestValue=_currentValue;	if (_status.reset || abs(_currentValue-_publicValue)>=_threshold )	{		xPL_Sensor_MessageTrig(*this).send();
+xPL_Sensor_Message::xPL_Sensor_Message(xPL_Sensor& sensor,const VString& request):xPL_Message(sensor){	if (request==S(current)) _request=current;	else if (request==S(name)) _request=name;	else _request=none;}size_t xPL_Sensor_Message::printContentTo(Print& p) const {	size_t l = 0;	if (_node)	{		l += printKeyTo(p,S(device),((xPL_Sensor*)_node)->id);		l += printKeyTo(p,S(type),_node->className());		switch(_request) {		case current:			l += ((xPL_Sensor*)_node)->printCurrentTo(p);			break;		case name:			l += printKeyTo(p,S(name),((xPL_Sensor*)_node)->id);			break;		default:			break;		}	}	return l;}xPL_SensorGeneric::xPL_SensorGeneric(const VString& name):xPL_Sensor(name) {	_count = 0;	_maxCount = 1;	_threshold=0.1;	_status.reset=true;}size_t xPL_SensorGeneric::printCurrentTo(Print& p) const{	size_t l=0;	l += xPL_Message::printKeyTo(p,S(current),_currentValue);#ifdef XPL_SENSOR_EXTRA	l += xPL_Message::printKeyTo(p,S(lowest),_lowestValue);	l += xPL_Message::printKeyTo(p,S(highest),_highestValue);#endif	l += xPL_Message::printKeyTo(p,S(units),units()); 	_publicValue=_currentValue;	return l;}/*void xPL_SensorGeneric::setValue(float v) {	_currentValue=v;	if (_status.reset || _highestValue<v) _highestValue=v;	if ( _status.reset || _lowestValue>v) _lowestValue=v;	_status.reset=false;	if (abs((float)_currentValue-(float)_publicValue)>=_threshold )	{		xPL_Sensor_MessageTrig(*this).send();
+	}}*/void xPL_SensorGeneric::setValue(float v) {	lcd.saveCursor();	lcd.setCursor(0,2); lcd.print(v,2);	lcd.restoreCursor();	if (_count==0) _currentValue=v;	else _currentValue+=v;	if (_count<_maxCount)	{		_count++;		return;	}		_currentValue/=_count;	_count = 0;#ifdef XPL_SENSOR_EXTRA	if (_buffer.size())	{/*		if (_buffer.setValue(v))			_currentValue=_buffer.avg();		else return;*/		_buffer.setValue(v);		_currentValue = _buffer.getMax();	}	else#endif		_currentValue=v;	lcd.saveCursor();	lcd.setCursor(10,2); lcd.print(_currentValue,2);	lcd.restoreCursor();#ifdef XPL_SENSOR_EXTRA	if (_status.reset || _highestValue <_currentValue) _highestValue=_currentValue;	if ( _status.reset || _lowestValue >_currentValue) _lowestValue=_currentValue;#endif	if (_status.reset || abs(_currentValue-_publicValue)>=_threshold )	{		xPL_Sensor_MessageTrig(*this).send();
 	}	_status.reset=false;}
-bool xPL_Sensor::targeted(xPL_MessageIn& msg)
+bool xPL_Sensor::targeted(xPL_MessageIn& msg) const
 {
-//	VString s = msg.key_device();
-//	if (!s) return false;
-//	if (!id() || s!=*id()) return false;
-
-	if (msg.key_device() != id()) return false;
+	if (msg.key_device() != id) return false;
 
 	VString s = msg.key_type();
 	if (!s) return true;
@@ -41,6 +37,5 @@ bool xPL_Sensor::targeted(xPL_MessageIn& msg)
 	return false;
 }
 
-bool xPL_Sensor::parseMessage(xPL_MessageIn& msg) {	if (!targeted(msg)) return false;	if ( msg.schema.instance == S(request) )	{		VString req = msg.key_request();		msg.deleteChilds();		xPL_Sensor_Message(*this,req).send();
-
-	}	return false;}void xPL_Sensor::trig(){	xPL_Sensor_MessageTrig(*this).send();}bool xPL_SchemaSensor::parseMessage(xPL_MessageIn& msg){	if (!targeted(msg)) return false;	return true;}
+void xPL_Sensor::parseMessage(xPL_MessageIn& msg) {	if ( msg.schema.instance == S(request) )	{		VString req = msg.key_request();		// Todo : flush memory		xPL_Sensor_Message(*this,req).send();
+	}}void xPL_Sensor::trig(){	xPL_Sensor_MessageTrig(*this).send();}void xPL_SchemaSensor::parseMessage(xPL_MessageIn& msg){	return sendParseMessage(msg);}

@@ -500,19 +500,17 @@ public:
 };
 
 
-bool xPL_ENC28J60::loop()
+void xPL_ENC28J60::loop()
 {
-	if (!connection()) { return false; }
+	if (!connection()) { return; }
 
 	size_t addr = gNextPacketPtr; 
 
 	word receiveLen = packetReceive();
-	if (!receiveLen) { return false; }
+	if (!receiveLen) { return; }
 
 
 	drop(23); 
-
-
 
 	if ( readByte() == 0x11 ) // it is an UDP packet
 	{
@@ -522,7 +520,7 @@ bool xPL_ENC28J60::loop()
 
 		if (udp_port == XPL_PORT)
 		{
-			DBG(F("xPL>"),receiveLen);
+			DBG(F("<ENC28J60 xPL>"),receiveLen);
 
 			VString msg(addr + 35,receiveLen-42,VSHelperENC28J60::helper);
 
@@ -530,8 +528,6 @@ bool xPL_ENC28J60::loop()
 		}
 	}
 	packetRelease();
-
-	return true;
 }
 
 size_t printWord(Print& p, word w) { 
@@ -580,7 +576,7 @@ size_t printIP(Print& p, word totallen, word chksum=0)
 }
 
 
-size_t printUDP(Print& p, Printable& data, word len_udp, word chksum=0)
+size_t printUDP(Print& p, xPL_Message& data, word len_udp, word chksum=0)
 {
 
 	size_t len =0;
@@ -592,7 +588,7 @@ size_t printUDP(Print& p, Printable& data, word len_udp, word chksum=0)
 
 	len += printWord(p,chksum);
 
-	len += p.print(data);
+	len += data.printTo(p);
 
 	return len;
 }
@@ -602,9 +598,7 @@ class checksum : public Print {
 	uint32_t _sum;
 	uint32_t _len;
 public:
-	checksum() {
-		reset();
-	}
+	checksum() { reset(); }
 
 	void reset() {
 		_sum = 0;
@@ -623,15 +617,17 @@ public:
 		return 1;
 	}
 
-	word sum_udp() {
+	word sum_udp()
+	{
 		uint32_t s = _sum + 0x11 + _len -8;
 		while (s>>16)
 			s = (word) s + (s >> 16);
 	
 		return ~(word)s;
 	}
-	word sum() {
 
+	word sum()
+	{
 		uint32_t s = _sum;
 		while (s>>16)
 			s = ((word) s) + (s >> 16);
@@ -691,9 +687,12 @@ public:
 };
 bool xPL_ENC28J60::sendMessage(xPL_Message& msg) {
 
-	size_t datalen = VString(&msg).len();
+	size_t datalen = msg.len();
 
 	DBG(F("<send_ENC28J60> "),datalen);
+
+	lcd.print('s');
+
 	if (connection()) 
 	{
 		checksum chk_ip;
@@ -702,6 +701,7 @@ bool xPL_ENC28J60::sendMessage(xPL_Message& msg) {
 
 		printIP(chk_ip,20 + 8 + datalen);
 	//DBG(F("chk_ip "),chk_ip.len());
+
 
 	for (byte i=0;i<4;i++) chk_udp.print('\0');
 	for (byte i=0; i<4; i++) chk_udp.print('\xFF');
@@ -716,6 +716,7 @@ bool xPL_ENC28J60::sendMessage(xPL_Message& msg) {
 		printUDP(filler, msg, 8 + datalen ,chk_udp.sum_udp());
 
 		filler.send();
+		lcd.print('e');
 
 		return true;
 	}

@@ -22,7 +22,10 @@
 
 #include "xPL_Debug.h"
 #include "vstring.h"
+#include "xPL_String.h"
 
+LiquidCrystal_I2C lcd(0x20,16,4);
+bool debug_flag=false;
 
 uint8_t * heapptr, * stackptr;
 void check_mem() {
@@ -70,6 +73,14 @@ long printMemCost(const __FlashStringHelper* msg) {
 	oldMem = newMem;
 	return mem;
 }
+
+void printMemLCD() {
+	lcd.saveCursor();
+	lcd.setCursor(0,3); lcd.print(S(_blkline));
+	lcd.setCursor(0,3); lcd.print(get_free_memory());
+	lcd.restoreCursor();
+}
+
 /*
 void fix28135_malloc_bug()
  {

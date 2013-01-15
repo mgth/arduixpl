@@ -26,20 +26,19 @@
 
 xPL_Hbeat::xPL_Hbeat(uint16_t interval):xPL_Schema() {
 	_interval = interval;
-	xPL.trigHbeat();
+	_trigHbeat = true;
 }
 
 xPL_Hbeat::xPL_Hbeat() {
 	xPL_Hbeat( XPL_HBEAT_INTERVAL );
 }
 
-void xPL_Hbeat::sendHbeat(const __FlashStringHelper* type,bool configured,const VString* id) {
-
-	xPL_Hbeat_Message msg(*this);
+void xPL_Hbeat::sendHbeat(const __FlashStringHelper* type) {
 
 	_lastHbeatTime = millis();
+	_trigHbeat = false;
 
-	msg.send();
+	xPL_Hbeat_Message(*this).send();
 }
 
 size_t xPL_Hbeat_Message::printContentTo(Print& p) const {	return ((xPL_Hbeat*)_node)->printConfigCurrent(p);}size_t xPL_HbeatEnd_Message::printContentTo(Print& p) const { return 0; }
@@ -54,66 +53,57 @@ size_t xPL_Hbeat::printConfigCurrent(Print& p) {
 	return xPL_Message::printKeyTo(p,S(interval),(int)intervalMinutes() );
 };
 
-bool xPL_Hbeat::configure(xPL_Key& key)
+void xPL_Hbeat::configure(xPL_Key& key)
 {
-	if (key.key == S(interval))
+	if (key.id == S(interval))
 	{
 		//uint16_t val = (uint16_t) ((key.sValue().toInt()));
 
 		setIntervalMinutes( xPL_Int(key.value) );
-		return true;
 	}
 	return xPL_Schema::configure(key);
 }
 
-bool xPL_Hbeat::loop() {
+void xPL_Hbeat::loop() {
 
 	// send config.end/hbeat.end message when renaming instance
 	if (xPL.oldId())
 	{
-		sendHbeat(S(end),xPL.oldConfigured(),&xPL.oldId());
+		sendHbeat(S(end));
 		xPL.oldId().clear();
 	}
 
 	// if it's time to or trigged, send heartbeat
-	if ( xPL.trigHbeat(false) || (millis()-_lastHbeatTime)>=interval() ) {
-		sendHbeat(S(basic),xPL.configured());
+	if ( _trigHbeat || (millis()-_lastHbeatTime)>=interval() ) {
+		sendHbeat(S(basic));
 	}
-	return false;
 }
 
-bool xPL_Hbeat::parseMessage(xPL_MessageIn& msg)
+void xPL_Hbeat::parseMessage(xPL_MessageIn& msg)
 {
-	if (!targeted(msg)) return false;
 	if ( msg.schema.instance == S(request) )
 	{
 		if (msg.key_command() == S(request))
 		{
-			xPL.trigHbeat();
+			trigHbeat();
 		}
 	}
-	
-	return false;
 }
+
 /*****************************************
 EEPROM
 *****************************************/
-bool xPL_Hbeat::loadDefaultConfig()
+void xPL_Hbeat::loadConfig(xPL_Eeprom& eeprom)
 {
-	_interval = XPL_HBEAT_INTERVAL;
-	xPL.trigHbeat();
-	return false;
+	if (eeprom.isxPL())
+		eeprom.readAny(_interval);
+	else
+		_interval = XPL_HBEAT_INTERVAL;
+
+	trigHbeat();
 }
 
-bool xPL_Hbeat::loadConfig(xPL_Eeprom& eeprom)
-{
-	eeprom.readAny(_interval);
-	xPL.trigHbeat();
-	return false;
-}
-
-bool xPL_Hbeat::storeConfig(xPL_Eeprom& eeprom)
+void xPL_Hbeat::storeConfig(xPL_Eeprom& eeprom)
 {
 	eeprom.writeAny(_interval);
-	return false;
 }

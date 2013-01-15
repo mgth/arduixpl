@@ -23,10 +23,33 @@
 #include "xPL_Node.h"
 #include "xPL_Message.h"
 
-xPL_Node* xPL_Node::findOrAdd(const VString& id)
+xPL_Node* xPL_Node::nextLoop() { return (_next)?_next:(_parent?_parent->child():NULL); }
+xPL_Node* xPL_Node::prev() {
+	if (_parent)
+	{
+		xPL_Node* n = _parent->child();
+		if (n==this) return NULL;
+		while(n && n->next()!=this) n=next();
+		return n;
+	}
+	return NULL;
+}
+xPL_Node* xPL_Node::prevLoop() { 
+	if (_parent)
+	{
+		xPL_Node* n = _parent->child();
+		while(n->nextLoop()!=this) n=nextLoop();
+		return n;
+	}
+	return NULL;
+}
+
+xPL_Schema* xPL_Node::schema() { return (_parent)?_parent->schema():NULL; }
+
+xPL_Node* xPL_Node::findOrAdd(const VString& cmpid)
 {
-	xPL_Node* n = findChild(id);
-	if (!n) n = add(id);
+	xPL_Node* n = findChild(cmpid);
+	if (!n) n = add(cmpid);
 	return n;
 }
 
@@ -52,25 +75,29 @@ xPL_Node* xPL_NodeParent::addChild( xPL_Node* node)
 	return node;
 }
 
-xPL_Node* xPL_Node::find(const VString& cmpid) {
+xPL_Node* xPL_Node::find(const VString& id) {
 
-	if ( id() == cmpid ) return this;
-	if (_next) return _next->find(cmpid);
+	if ( is(id) ) return this;
+
+	if (_next) return _next->find(id);
+
 	return NULL;
 }
 
-xPL_Node* xPL_Node::findChild(const VString& id) { if (child()) return child()->find(id); return NULL; }
+xPL_Node* xPL_Node::findChild(const VString& cmpid)
+{
+	if (child())
+	{
+		return child()->find(cmpid);
+	}
+	return NULL;
+}
 
 int xPL_Node::count() const {
-	class :public xPL_Event {
-	public: 
-		mutable int count;
-		virtual bool send(xPL_Node* n) const { count++; return false; }
-	} evt;
-
-	evt.count=0;
-	const_cast<xPL_Node*>(this)->sendEvent(evt,true);
-	return evt.count;
+	int c = 0;
+	xPL_Node* n = _child;
+	while(n) { c++; n=n->next(); }
+	return c;
 }
 
 
@@ -78,11 +105,10 @@ xPL_Node::~xPL_Node() { deleteChilds(); }
 
 void xPL_Node::deleteNode(bool deleteAll)
 {
-	if (deleteAll && _next) {
-		_next->deleteNode(deleteAll);
-	}
-	// TODO, adjust next of previous item.
-	DELETE(this);
+	if (deleteAll && _next) { _next->deleteNode(deleteAll); }
+
+	if ( prev() ) { prev()->_next = _next; }
+	delete this;
 }
 
 void xPL_NodeParent::deleteChilds() 
@@ -91,25 +117,76 @@ void xPL_NodeParent::deleteChilds()
 	while(n)
 	{
 		xPL_Node* ndel = n; n = n->_next;
-		DELETE(ndel);
+		delete ndel;
 	}
 	_child=NULL;
 }
-
+/*
 void xPL_Node::sendEvent (const xPL_Event& evt, bool childsOnly, bool all)
 {
 	if (all && _next) { _next->sendEvent(evt,childsOnly,all);}
-	if (childsOnly || evt.send(this))
+	if (childsOnly || evt.send(*this))
 	{ 
 		if (child()) child()->sendEvent(evt,false,true);
-		evt.close(this);
+//		evt.close(*this);
 	}
 }
+*/
+void xPL_Node::sendLoop()
+{
+	xPL_Node* n = child();
+	while(n) { n->loop(); n=n->next(); }
+}
+
+void xPL_Node::sendParseMessage (xPL_MessageIn& msg)
+{
+	xPL_Node* n = child();
+	while(n) {
+		if (n->targeted(msg))
+			n->parseMessage(msg);
+		
+		n=n->next();
+	}
+}
+
+void xPL_Node::sendCheckTargeted (xPL_MessageIn& msg)
+{
+	xPL_Node* n = child();
+	while(n) { n->parseMessage(msg); n=n->next(); }
+}
+
+void xPL_Node::sendConfigure (xPL_Key& key)
+{
+	xPL_Node* n = child();
+	while(n) { n->configure(key); n=n->next(); }
+}
+
+void xPL_Node::sendStoreConfig (xPL_Eeprom& eeprom)
+{
+	xPL_Node* n = child();
+	while(n) { n->storeConfig(eeprom); n=n->next(); }
+}
+
+void xPL_Node::sendLoadConfig (xPL_Eeprom& eeprom)
+{
+	xPL_Node* n = child();
+	while(n) { n->loadConfig(eeprom); n=n->next(); }
+}
+
+void xPL_Node::sendInterrupt (uint8_t pin, unsigned long time)
+{
+	xPL_Node* n = this->child();
+	while(n) { n->interrupt(pin,time); n=n->next(); }
+}
+
+
+
+/*
 void xPL_Node::sendEventConst (const xPL_Event& evt, bool childsOnly, bool all) const
 {
 	const_cast<xPL_Node*>(this)->sendEvent(evt,childsOnly,all);
 }
-
+*/
 /********************************************************************
 CONFIG
 ********************************************************************/
@@ -121,15 +198,13 @@ xPL_Node* xPL_Node::readConfig(xPL_Eeprom& eeprom)
 	return NULL;
 }
 
-bool xPL_Node::loadConfig(xPL_Eeprom& eeprom)
+void xPL_Node::loadConfig(xPL_Eeprom& eeprom)
 {
 	while ( xPL_Node* node = readConfig(eeprom))
 	{
-		node->sendEvent(&xPL_Node::loadConfig,eeprom);
+		node->loadConfig(eeprom);
 	}
-	return false;
 }
 
-bool xPL_Node::storeConfig(xPL_Eeprom& eeprom) { id().printlnTo(eeprom,'\0'); return true;}
+void xPL_Node::storeConfig(xPL_Eeprom& eeprom) { sendStoreConfig(eeprom); eeprom.write('\0'); }
 
-void xPL_Node::storeConfigClose(xPL_Eeprom& eeprom) { eeprom.write('\0'); }

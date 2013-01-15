@@ -29,10 +29,12 @@
 
 class xPL_Config : public xPL_Hbeat {
 private:
+		bool _configured; 
 
 protected:
 	virtual bool parseMessage(xPL_MessageIn& msg);
 
+	virtual bool configure(xPL_Key& key);
 	virtual bool loadConfig(xPL_Eeprom& eeprom);
 	virtual bool loadDefaultConfig();
 

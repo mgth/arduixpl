@@ -43,7 +43,7 @@ public:
 	
 	virtual bool connection();
 
-	virtual bool loop();
+	virtual void loop();
 	virtual bool sendMessage(xPL_Message& msg);
 
 #ifdef XPL_HTML_SUPPORT

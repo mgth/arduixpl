@@ -24,14 +24,30 @@
 
 xPL_Config xplConfig;
 
+bool xPL_Config::configure(xPL_Key& key)
+{
+	if (key.id == S(newconf))
+	{
+		VString& value = key.value;
+
+		if ( xPL.source().instance == value || xPL.setId(value) )
+		{
+			_configured=true;
+		}
+		_trigHbeat = true;
+		return false; // just mean not to configure childs with that key
+	}
+	return true;
+}
+
 /*****************************************
 EEPROM
 *****************************************/
 bool xPL_Config::loadDefaultConfig()
 {
 	_interval = XPL_CONFIG_INTERVAL;
-	xPL.trigHbeat();
-	xPL.setConfigured(false);
+	_trigHbeat = true;
+	_configured = false;
 	return false;
 }
 bool xPL_Config::loadConfig(xPL_Eeprom& eeprom)
@@ -39,7 +55,7 @@ bool xPL_Config::loadConfig(xPL_Eeprom& eeprom)
 	xPL_Hbeat::loadConfig(eeprom);
 	xPL.setConfigured(true);
 
-	xPL.trigHbeat();
+	_trigHbeat = true;
 	return false;
 }
 
@@ -48,7 +64,6 @@ bool xPL_Config::loadConfig(xPL_Eeprom& eeprom)
 
 bool xPL_Config::parseMessage(xPL_MessageIn& msg)
 {
-	if (!targeted(msg)) return xPL_Hbeat::parseMessage(msg);
 	if ( msg.schema.schType() == S(list) || msg.schema.schType() == S(current) )
 	{
 		if (msg.key_command() == S(request))

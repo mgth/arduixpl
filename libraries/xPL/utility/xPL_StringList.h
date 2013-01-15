@@ -172,3 +172,8 @@
 	C(xPL)
 	C(li)
 	//C(dummytotestcompileroptimization)
+
+
+	// LCD Debug
+
+	CF(_blkline,"                    ");

@@ -34,12 +34,13 @@ private:
 protected:
   unsigned long _lastHbeatTime;
   uint16_t _interval;
+  bool _trigHbeat;
 
-	virtual bool loop();
+	virtual void loop();
+	virtual void parseMessage(xPL_MessageIn& msg);
 
 	virtual size_t printConfigList(Print& p);
-	virtual bool configure(xPL_Key& key);
-	virtual bool parseMessage(xPL_MessageIn& msg);
+	virtual void configure(xPL_Key& key);
 
 public:	
 	virtual const __FlashStringHelper* className() const { return S(hbeat); }	
@@ -48,9 +49,8 @@ public:
 	xPL_Hbeat(uint16_t interval);
     xPL_Hbeat();
 
-	virtual bool loadConfig(xPL_Eeprom& eeprom);
-	virtual bool loadDefaultConfig();
-	virtual bool storeConfig(xPL_Eeprom& eeprom);
+	virtual void loadConfig(xPL_Eeprom& eeprom);
+	virtual void storeConfig(xPL_Eeprom& eeprom);
 	virtual size_t printConfigCurrent(Print& p);
 
 	void setIntervalMinutes(uint16_t interval){_interval=interval;}
@@ -59,7 +59,8 @@ public:
 
 	uint16_t intervalMinutes() const { return _interval;} // TODO : should be able to return decimal value ?
 
-	void sendHbeat(const __FlashStringHelper* type,bool configured,const VString* id=NULL);
+	void sendHbeat(const __FlashStringHelper* type);
+	bool trigHbeat(bool b=true) { bool r = _trigHbeat; _trigHbeat=b; return r; }
 
 };
 

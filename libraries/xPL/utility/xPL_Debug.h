@@ -24,6 +24,11 @@
 #define XPL_DEBUG_H
 #include "xPL_Define.h"
 
+#ifdef XPL_DEBUG_LCD
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+#endif
+
 #ifdef XPL_SLOWDEBUG
 #define DBG(s,v) Serial.print(s);Serial.println(v); delay(500);
 #elif defined(XPL_DEBUG)
@@ -60,7 +65,10 @@ extern uint8_t* __brkval;
 //extern "C" void   atexit( void );
 
 long get_free_memory();
+void printMemLCD();
 long printMemCost(const __FlashStringHelper* msg);
 
+extern LiquidCrystal_I2C lcd;
+extern bool debug_flag;
 
 #endif

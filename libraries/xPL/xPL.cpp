@@ -21,19 +21,15 @@
 */
 
 #include "xPL.h"
-#include "utility/xPL_Adapter.h"
+#include "xPL_Adapter.h"
 
 xPL_Main::xPL_Main()
 {
 	_adapter = NULL;
-	_state.oldConfigured = _state.configured = true;
-	_state.trigHbeat = false;
 	_state.deleteGroups = _state.deleteFilters = false;
 	_source.vendor = S(_vendorid);
 	_source.device = S(_deviceid);
 }
-
-const VString xPL_Main::id() const { return _source.instance; }
 
 bool xPL_Main::setId(const VString& s)
 {
@@ -52,12 +48,8 @@ bool xPL_Main::setId(const VString& s)
 	VString& xPL_Main::oldId() { return _oldId; }
 	xPL_Address& xPL_Main::source() { return _source; }
  
-	bool xPL_Main::trigHbeat(bool b) { bool old=_state.trigHbeat; _state.trigHbeat = b; return old; }
 	bool xPL_Main::deleteGroups(bool b) { bool old=_state.deleteGroups; _state.deleteGroups = b; return old; }
 	bool xPL_Main::deleteFilters(bool b) { bool old=_state.deleteFilters; _state.deleteFilters = b; return old; }
-
-	bool xPL_Main::configured() { return _state.configured; }
-	bool xPL_Main::oldConfigured() { return _state.oldConfigured; }
 
 	void xPL_Main::setAdapter(xPL_Adapter* adapter) { _adapter=adapter; }
 
@@ -76,40 +68,40 @@ bool xPL_Main::setId(const VString& s)
 #if defined (__AVR_ATmega328P__)|| defined(__AVR_ATmega168P__) || defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)			case 2:				::detachInterrupt(0);				return true;			case 3:				::detachInterrupt(1);				return true;#endif#if defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)			case 21:				::detachInterrupt(2);				return true;			case 20:				::detachInterrupt(3);				return true;			case 19:				::detachInterrupt(4);				return true;			case 18:				::detachInterrupt(5);				return true;#endif#if defined (__AVR_ATmega32U4__)			case 3:				::detachInterrupt(0);				return true;			case 2:				::detachInterrupt(1);				return true;			case 0:				::detachInterrupt(2);				return true;			case 1:				::detachInterrupt(3);				return true;#endif		}		return false;	}
 
 	//TODO: calculate funtion overhead
-	void xPL_Main::xplInterrupt(uint8_t pin) { xPL.sendEvent(xPL_EventInterrupt(pin,micros())); }
+	void xPL_Main::xplInterrupt(uint8_t pin) { xPL.interrupt(pin,micros()); }
 #if defined (__AVR_ATmega328P__)|| defined(__AVR_ATmega168P__) || defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)	void xPL_Main::xplInterrupt0() { xplInterrupt(2); }	void xPL_Main::xplInterrupt1() { xplInterrupt(3); }#endif#if defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)	void xPL_Main::xplInterrupt2() { xplInterrupt(21); }	void xPL_Main::xplInterrupt3() { xplInterrupt(20); }	void xPL_Main::xplInterrupt4() { xplInterrupt(19); }	void xPL_Main::xplInterrupt5() { xplInterrupt(18); }#endif#if defined (__AVR_ATmega32U4__)	void xPL_Main::xplInterrupt0() { xplInterrupt(3); }	void xPL_Main::xplInterrupt1() { xplInterrupt(2); }	void xPL_Main::xplInterrupt2() { xplInterrupt(0); }	void xPL_Main::xplInterrupt3() { xplInterrupt(1); }#endif
 
 /************************************************************
  * CONFIG                                             *
  ************************************************************/
 // EEPROM
-bool xPL_Main::loadConfig(xPL_Eeprom& eeprom)
+void xPL_Main::loadConfig(xPL_Eeprom& eeprom)
 {
-	_source.instance = eeprom.readString();
-	_source.instance.load();
-	return true;
-}
-
-bool xPL_Main::loadDefaultConfig()
-{
+	if (eeprom.isxPL())
+	{
+		_source.instance = eeprom.readString();
+		_source.instance.load();
+	}
+	else
+	{
 	//_source.instance = S(default);
-	return true;
+	}
+	sendLoadConfig(eeprom);
 }
 
-bool xPL_Main::storeConfig(xPL_Eeprom& eeprom)
+void xPL_Main::storeConfig(xPL_Eeprom& eeprom)
 {
 	eeprom.setAddress(3);
 	_source.instance.printlnTo(eeprom,'\0');
 
 	eeprom.setxPL();
-	return true;
+	sendStoreConfig(eeprom);
 }
 
-bool xPL_Main::storeConfig()
+void xPL_Main::storeConfig()
 {
 	xPL_Eeprom eeprom(3);
-	sendEvent(&xPL_Node::storeConfig,eeprom);
-	return true;
+	storeConfig(eeprom);
 }
 
 // Messages
@@ -123,27 +115,7 @@ size_t xPL_Main::printConfigCurrent(Print& p)
 	return xPL_Message::printKeyTo(p,S(newconf),source().instance );
 }
 
-bool xPL_Main::configure(xPL_Key& key)
-{
-	if (key.key == S(newconf))
-	{
-		VString& value = key.value;
 
-		if ( _source.instance == value || setId(value) )
-		{
-			setConfigured();
-		}
-		trigHbeat();
-		return false; // just mean not to configure childs with that key
-	}
-	return true;
-}
-
-void xPL_Main::setConfigured(bool c)
-{
-	 _state.oldConfigured = _state.configured && c;
-	_state.configured     = c;
-}
 /************************************************************
  * begin                                                     *
  ************************************************************/
@@ -154,42 +126,27 @@ void xPL_Main::begin(const __FlashStringHelper* vendor,const __FlashStringHelper
 	_source.device=device;
 	if (instance) _source.instance=instance; else _source.instance=S(default);
 
-
-	// if reset_pin HIGH, config is not loaded
-	pinMode(XPL_RESET_PIN, INPUT);
-	// TODO : enable eeprom config when ok
-	if ( false && eeprom.isxPL() && !digitalRead(XPL_RESET_PIN) )
-	{
-		eeprom.setAddress(3);
-
-		DBG(F("Cfg:EEProm"),);
-
-		sendEvent(&xPL_Node::loadConfig,eeprom);
-	}
-	else
-	{
-		DBG(F("Cfg:Default"),);
-		sendEvent(&xPL_Node::loadDefaultConfig);
-	}
+	loadConfig(eeprom);
 }
+
+
 /************************************************************
  * loop                                                     *
  ************************************************************/
-bool xPL_Main::loop() { return true; }
-void xPL_Main::loopAll() {
+void xPL_Main::loop() {
 
 #ifdef XPL_SLOWDEBUG
 	class :public xPL_Event {
 	public: 
 		mutable int count;
-		virtual bool send(xPL_Node* n) const {
+		virtual bool send(xPL_Node& n) const {
 			Serial.print(F("<"));
-			Serial.print( n->className() );
+			Serial.print( n.className() );
 			printMemCost(F(" loop>"));
 			//Serial.print(F(" - "));
 			//if (n->id()) Serial.println(*n->id());
 			delay(XPL_SLOWDEBUG);
-			bool r = n->loop();
+			bool r = n.loop();
 
 			Serial.print(F("<end "));
 			VString(n->className()).printlnTo(Serial,'>');
@@ -204,9 +161,30 @@ void xPL_Main::loopAll() {
 	
 	sendEvent(evt);
 #else
+#ifdef XPL_DEBUG_LCD
+
+	xPL_Node* n = child();
+	while(n)
+	{
+		lcd.setCursor(0,0); lcd.print( S(_blkline) );
+		lcd.setCursor(0,0); lcd.print( n->className() );
+		lcd.setCursor(19,0);lcd.print('S');
+		lcd.setCursor(0,3);printMemLCD();
+		lcd.setCursor(0,1);	lcd.print( S(_blkline) ); lcd.setCursor(0,1);
+		n->loop();
+		lcd.setCursor(0,2);
+		lcd.setCursor(19,0);lcd.print('E');
+		lcd.setCursor(0,3);printMemLCD();
+#ifdef XPL_SLOWDEBUG
+		delay(XPL_SLOWDEBUG);
+#endif
+		n=n->next();
+	}
+	
+#else
 	sendEvent(&xPL_Node::loop);
 #endif
-
+#endif
 }
 
 
@@ -231,15 +209,18 @@ bool xPL_Main::receivedMessage(VString& buffer) {
 
 	if (msg.parseHeader())
 	{
-		DBG(msg,);
+#ifdef XPL_DEBUG
+		DBG(F("<received>"),);
+		buffer.printTo(Serial);
+#endif
 
 		if (msg.msgType.instance==S(cmnd))
 		{
-			sendEvent(&xPL_Node::checkTargeted,msg);
+			checkTargeted(msg);
 
 			if(msg.targeted())
 			{
-				sendEvent(&xPL_Node::parseMessage,msg,true);
+				parseMessage(msg);
 			
 			}
 		}
@@ -250,11 +231,11 @@ bool xPL_Main::receivedMessage(VString& buffer) {
 /************************************************************
  * checkTargeted                                            *
  ************************************************************/
-bool xPL_Main::checkTargeted(xPL_MessageIn& msg)
+void xPL_Main::checkTargeted(xPL_MessageIn& msg)
 {
 	xPL_Address& addr = msg.target;
 	msg.setTargeted(addr.isAny() || addr == source() );
-	return true;
+	sendCheckTargeted(msg);
 }
 
 

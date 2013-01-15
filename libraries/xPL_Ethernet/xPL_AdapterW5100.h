@@ -42,7 +42,7 @@ private:
 
 public:
 	virtual bool begin();
-	virtual bool loop();
+	virtual void loop();
 	virtual bool sendMessage(xPL_Message& msg);
 	virtual bool connection();
 

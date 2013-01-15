@@ -14,6 +14,9 @@ DEBUG OPTIONS
 #define XPL_DEBUG
 // to print memory related debug info
 #define XPL_DEBUG_MEM
+// to print debug info on LCD
+#define XPL_DEBUG_LCD
+
 //uncomment to reduce main loop speed, mainly useful to know whitch module hang
 //#define XPL_SLOWDEBUG 100
 

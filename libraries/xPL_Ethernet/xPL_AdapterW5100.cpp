@@ -49,7 +49,7 @@ bool xPL_AdapterW5100::begin()
 	return _udp.begin(XPL_PORT);
 }
 
-bool xPL_AdapterW5100::loop() {
+void xPL_AdapterW5100::loop() {
 			
 	size_t len = _udp.parsePacket();
 		
@@ -72,16 +72,16 @@ bool xPL_AdapterW5100::loop() {
 
 		free(buffer);
 	}
-	return false;
 }
 
 bool xPL_AdapterW5100::sendMessage(xPL_Message& msg)
 {
 
 	
-
+#ifdef XPL_DEBUG
 	DBG(F("<send_W5100>"),);
-	DBG(msg,);
+	msg.printTo(Serial);
+#endif
 
 	if (connection()) 
 	{
@@ -96,7 +96,7 @@ bool xPL_AdapterW5100::sendMessage(xPL_Message& msg)
 
 		//char* buffer = (char*)malloc( VString(msg).len() );
 
-		xPL_BufferFiller buf( VString(&msg).len() );
+		xPL_BufferFiller buf( msg.len() );
 		msg.printTo(buf);
 
 		_udp.write(buf.buffer(),buf.position());

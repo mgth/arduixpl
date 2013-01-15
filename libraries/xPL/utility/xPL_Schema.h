@@ -28,13 +28,11 @@
 class xPL_Schema : public xPL_NodeParent
 {
 protected:
-	virtual bool parseMessage(xPL_MessageIn& msg);
-	virtual bool configure(xPL_Key& key);
-	virtual bool targeted(xPL_MessageIn& msg);
+	virtual void parseMessage(xPL_MessageIn& msg);
+	virtual void configure(xPL_Key& key);
+	virtual bool targeted(xPL_MessageIn& msg) const;
 	
 public:
-
-	xPL_Schema();
 
 	virtual void reg();
 	virtual xPL_Schema* schema();

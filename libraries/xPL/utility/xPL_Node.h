@@ -29,7 +29,7 @@
 #include "xPL_String.h"
 #include "xPL_BufferFiller.h"
 #include "xPL_Eeprom.h"
-#include "xPL_Event.h"
+//#include "xPL_Event.h"
 class xPL_Main;
 class xPL_Key;
 class xPL_Message;
@@ -45,7 +45,7 @@ class xPL_NodeParent;
 
 class xPL_Node : public Printable {
 protected: 
-	xPL_Node* _parent;
+	xPL_NodeParent* _parent;
 	xPL_Node* _next;
 #ifdef xPL_NodeParent
 	xPL_Node* _child;
@@ -54,31 +54,27 @@ protected:
 #endif
 
 
-	virtual bool targeted(xPL_Message& msg) { return false; }
+	virtual bool targeted(xPL_MessageIn& msg) const { return false; }
 
 
 public:
 
 // Properties
 	virtual const __FlashStringHelper* className() const { return S(xpl); }
-	virtual const VString id() const { return VString(); }
 
-	xPL_Node* parent() const { return _parent; }
-	xPL_Node* next() { return _next; }
-	xPL_Node* nextLoop() { return (_next)?_next:_parent->_child; }
-	xPL_Node* prevLoop() { 
-		xPL_Node* n = _parent->_child;
-		while(n->nextLoop()!=this) n=nextLoop();
-		return n;
-	}
+
 // Constructors
-
-
 	virtual ~xPL_Node();
-// Tree
-	virtual xPL_Schema* schema() { return (_parent)?_parent->schema():NULL; }
 
-	virtual xPL_Node* add(const VString& id) { return NULL; }
+// Tree
+	xPL_NodeParent* parent() const { return _parent; }
+	xPL_Node* next() { return _next; }
+	xPL_Node* nextLoop();
+	xPL_Node* prev();
+	xPL_Node* prevLoop();
+	virtual xPL_Schema* schema();
+
+	virtual xPL_Node* add(const VString& newid) { return NULL; }
 
 #ifndef xPL_NodeParent
 	xPL_Node():_parent(NULL),_next(NULL) {}
@@ -94,11 +90,12 @@ public:
 	xPL_Node* defaultChild() const;
 #endif
 
-	xPL_Node* findOrAdd(const VString& id);
+	xPL_Node* findOrAdd(const VString& cmpid);
 
 	void deleteNode(bool deleteAll=false);
 
-	xPL_Node* find(const VString& cmpid);
+	virtual bool is(const VString& id) { return false; }
+	xPL_Node* find(const VString& id);
 	xPL_Node* findChild(const VString& id);
 
 	xPL_Node* defaultNode() const;
@@ -106,7 +103,7 @@ public:
 	int count() const;
 
 // events
-
+/*
 	void sendEvent(const xPL_Event& evt,bool childsOnly=false, bool all=false);
 	void sendEventConst(const xPL_Event& evt,bool childsOnly=false, bool all=false) const;
 
@@ -140,35 +137,42 @@ public:
 		xPL_EventFunction<cls> evt(func);
 		return sendEventConst(evt,childsOnly,all);
 	}
+*/
 
 
-	virtual bool loop(){ return true; }
-	virtual bool parseMessage(xPL_MessageIn& msg) { return false; }
-	virtual bool checkTargeted(xPL_MessageIn& msg) { return false; }
+	void sendLoop();
+	virtual void loop(){ sendLoop(); }
 
-	virtual bool interrupt(uint8_t pin, unsigned long time) { return true; }
+	void sendParseMessage (xPL_MessageIn& msg);
+	virtual void parseMessage(xPL_MessageIn& msg) { }
+
+	void sendCheckTargeted (xPL_MessageIn& msg);
+	virtual void checkTargeted(xPL_MessageIn& msg) { }
+
+	void sendInterrupt (uint8_t pin, unsigned long time);
+	virtual void interrupt(uint8_t pin, unsigned long time) { sendInterrupt(pin,time); }
 
 	void msgAddKey(const VString& key,const VString& value, bool alloc=false) const ;
 
 //Config
 	virtual xPL_Node* readConfig(xPL_Eeprom& eeprom);
-	virtual bool loadConfig(xPL_Eeprom& eeprom);
-	virtual bool storeConfig(xPL_Eeprom& eeprom);
-	virtual void storeConfigClose(xPL_Eeprom& eeprom);
 
-	virtual bool loadDefaultConfig() { return false; }
+	void sendLoadConfig (xPL_Eeprom& eeprom);
+	virtual void loadConfig(xPL_Eeprom& eeprom);
 
-	virtual bool configure(xPL_Key& key) { return false; }
+	void sendStoreConfig (xPL_Eeprom& eeprom);
+	virtual void storeConfig(xPL_Eeprom& eeprom);
+
+	void sendConfigure (xPL_Key& key);
+	virtual void configure(xPL_Key& key) { }
+
 	virtual size_t printConfigList(Print& p) { return 0; }
 	virtual size_t printConfigCurrent(Print& p) { return 0; }
 //Printable
 	virtual size_t printTo(Print& p) const {
-			return id().printTo(p);
+			return 0;
 	}
 
-//Debug
-
-	void print();
 };
 
 #ifndef xPL_NodeParent
@@ -187,30 +191,6 @@ public:
 
 };
 #endif
-class xPL_ChildsPrinter : public Printable {
-
-	const xPL_Node* _node;
-
-public:
-	xPL_ChildsPrinter(const xPL_Node& node) { _node=&node; }
-
-	virtual size_t printTo(Print& p) const {
-
-		class :public xPL_Event {
-		public:
-			mutable size_t len;
-			Print* print;
-
-			virtual bool send(xPL_Node* n) const { len += print->print(*n); return false; }
-		} evt;
-
-		evt.print=&p;
-		evt.len=0;
-
-		_node->sendEventConst(evt,true);
-		return evt.len;
-	}
-};
 
 
 #endif
