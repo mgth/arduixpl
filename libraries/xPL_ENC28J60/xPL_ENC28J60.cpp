@@ -691,8 +691,6 @@ bool xPL_ENC28J60::sendMessage(xPL_Message& msg) {
 
 	DBG(F("<send_ENC28J60> "),datalen);
 
-	lcd.print('s');
-
 	if (connection()) 
 	{
 		checksum chk_ip;
@@ -716,7 +714,6 @@ bool xPL_ENC28J60::sendMessage(xPL_Message& msg) {
 		printUDP(filler, msg, 8 + datalen ,chk_udp.sum_udp());
 
 		filler.send();
-		lcd.print('e');
 
 		return true;
 	}

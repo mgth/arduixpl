@@ -200,10 +200,10 @@ xPL_Node* xPL_Node::readConfig(xPL_Eeprom& eeprom)
 
 void xPL_Node::loadConfig(xPL_Eeprom& eeprom)
 {
-	while ( xPL_Node* node = readConfig(eeprom))
+/*	while ( xPL_Node* node = readConfig(eeprom))
 	{
 		node->loadConfig(eeprom);
-	}
+	}*/
 }
 
 void xPL_Node::storeConfig(xPL_Eeprom& eeprom) { sendStoreConfig(eeprom); eeprom.write('\0'); }

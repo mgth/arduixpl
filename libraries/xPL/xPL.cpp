@@ -133,60 +133,46 @@ void xPL_Main::begin(const __FlashStringHelper* vendor,const __FlashStringHelper
 /************************************************************
  * loop                                                     *
  ************************************************************/
-void xPL_Main::loop() {
-
 #ifdef XPL_SLOWDEBUG
-	class :public xPL_Event {
-	public: 
-		mutable int count;
-		virtual bool send(xPL_Node& n) const {
-			Serial.print(F("<"));
-			Serial.print( n.className() );
-			printMemCost(F(" loop>"));
-			//Serial.print(F(" - "));
-			//if (n->id()) Serial.println(*n->id());
-			delay(XPL_SLOWDEBUG);
-			bool r = n.loop();
-
-			Serial.print(F("<end "));
-			VString(n->className()).printlnTo(Serial,'>');
-			Serial.println();
-
-			printMemCost(F("loop:"));
-			delay(XPL_SLOWDEBUG);
-			return r;
-		}
-	} evt;
-
-	
-	sendEvent(evt);
-#else
-#ifdef XPL_DEBUG_LCD
-
+void xPL_Main::loop()
+{
 	xPL_Node* n = child();
 	while(n)
 	{
+
+#ifdef XPL_DEBUG_LCD
 		lcd.setCursor(0,0); lcd.print( S(_blkline) );
 		lcd.setCursor(0,0); lcd.print( n->className() );
 		lcd.setCursor(19,0);lcd.print('S');
 		lcd.setCursor(0,3);printMemLCD();
 		lcd.setCursor(0,1);	lcd.print( S(_blkline) ); lcd.setCursor(0,1);
+#endif
+		
+		Serial.print(F("<"));Serial.print( n->className() );
+			
+		printMemCost(F(" loop>"));
+
+		delay(XPL_SLOWDEBUG);
+			
 		n->loop();
+
+		Serial.print(F("<end "));
+		VString(n->className()).printlnTo(Serial,'>');
+		Serial.println();
+
+		printMemCost(F("loop:"));
+
+#ifdef XPL_DEBUG_LCD
 		lcd.setCursor(0,2);
 		lcd.setCursor(19,0);lcd.print('E');
 		lcd.setCursor(0,3);printMemLCD();
-#ifdef XPL_SLOWDEBUG
-		delay(XPL_SLOWDEBUG);
 #endif
+		delay(XPL_SLOWDEBUG);
+
 		n=n->next();
 	}
-	
-#else
-	sendEvent(&xPL_Node::loop);
-#endif
-#endif
 }
-
+#endif
 
 /************************************************************
  * sendMessage                                          *

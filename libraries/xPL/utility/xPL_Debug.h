@@ -27,6 +27,7 @@
 #ifdef XPL_DEBUG_LCD
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
+extern LiquidCrystal_I2C lcd;
 #endif
 
 #ifdef XPL_SLOWDEBUG
@@ -68,7 +69,6 @@ long get_free_memory();
 void printMemLCD();
 long printMemCost(const __FlashStringHelper* msg);
 
-extern LiquidCrystal_I2C lcd;
 extern bool debug_flag;
 
 #endif

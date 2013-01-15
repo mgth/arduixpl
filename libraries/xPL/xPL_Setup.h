@@ -14,8 +14,10 @@ DEBUG OPTIONS
 #define XPL_DEBUG
 // to print memory related debug info
 #define XPL_DEBUG_MEM
+
 // to print debug info on LCD
-#define XPL_DEBUG_LCD
+//(you should include Wire.h & LiquidCrystal_I2C.h)
+//#define XPL_DEBUG_LCD
 
 //uncomment to reduce main loop speed, mainly useful to know whitch module hang
 //#define XPL_SLOWDEBUG 100
@@ -29,3 +31,6 @@ ETHERNET OPTIONS
 #define XPL_DHCP 
 // xPL default port, do not change
 #define XPL_PORT 3865
+
+#define PS2_CLK_PIN 6
+#define PS2_DATA_PIN 5

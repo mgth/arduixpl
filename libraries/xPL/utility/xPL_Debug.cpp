@@ -24,7 +24,10 @@
 #include "vstring.h"
 #include "xPL_String.h"
 
+#ifdef XPL_DEBUG_LCD
 LiquidCrystal_I2C lcd(0x20,16,4);
+#endif
+
 bool debug_flag=false;
 
 uint8_t * heapptr, * stackptr;
@@ -75,10 +78,12 @@ long printMemCost(const __FlashStringHelper* msg) {
 }
 
 void printMemLCD() {
+#ifdef XPL_DEBUG_LCD
 	lcd.saveCursor();
 	lcd.setCursor(0,3); lcd.print(S(_blkline));
 	lcd.setCursor(0,3); lcd.print(get_free_memory());
 	lcd.restoreCursor();
+#endif
 }
 
 /*

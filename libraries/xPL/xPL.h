@@ -58,8 +58,9 @@ protected:
 
 
 public:
-//id
+#ifdef XPL_SLOWDEBUG
 	virtual void loop();
+#endif
 	virtual const __FlashStringHelper* className() const { return S(xpl); }	
 
 	xPL_Main();
