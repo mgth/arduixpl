@@ -29,45 +29,36 @@
 #define XPL_MAX_FILTERS 16
 #endif
 
-typedef enum {MSGTYPE,VENDOR,DEVICE,INSTANCE,CLASS,TYPE} filterIndex;
+enum filterIndex {MSGTYPE,VENDOR,DEVICE,INSTANCE,CLASS,TYPE};
 
 class xPL_Filter:public xPL_Node {
 private:
-	xPL_String _field[6];
-
+	byte _mask;
+	VString* _field;
 protected:
-	virtual bool checkTargeted(xPL_Message& msg);
-	virtual bool msgAddConfigCurrent(xPL_Message& msg);
 
 public:
-	void setField(byte i,const xPL_String& s);
+	virtual size_t event(const xPL_Event& evt);
+	void setField(byte i,const VString& s);
 
 	size_t printTo(Print& p) const;
 
-	virtual bool loadConfig(xPL_Eeprom& eeprom);
-	virtual bool storeConfig(xPL_Eeprom& eeprom);
-
+	virtual ~xPL_Filter() {
+		free(_field);
+		// delete [] _field; TODO when arduino 1.0.4
+	}
 };
 
 class xPL_SchemaFilter:public xPL_Schema {
-protected:
-	virtual const prog_char* className() const { return S(filter); }
-	virtual bool checkTargeted(xPL_Message& msg) { return true; }
-	virtual bool msgAddConfigCurrent(xPL_Message& msg);
-	virtual bool msgAddConfigList(xPL_Message& msg);
-	virtual bool configure(xPL_Key& key);
+private:
+	bool _deleteFirst;
 
-public:
-	virtual xPL_Node*  readConfig(xPL_Eeprom& eeprom);
-	virtual bool storeConfig(xPL_Eeprom& eeprom);
+protected:
+	virtual const __FlashStringHelper* className() const { return S(filter); }
+	virtual size_t event(const xPL_Event& evt);
+
 };
 
 extern	xPL_SchemaFilter xplFilter;
-
-#ifndef XPL_BEGIN
-#define XPL_BEGIN ;
-#endif
-
-#define XPL_BEGIN XPL_BEGIN##xplFilter.reg();
 
 #endif

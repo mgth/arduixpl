@@ -56,7 +56,7 @@ public:
 	void setRandom();
 };
 
-class xPL_AdapterEthernet : public xPL_Adapter
+class xPL_AdapterEthernet : public xPL_Schema
 {
 protected:
 
@@ -66,22 +66,11 @@ protected:
 	bool _dhcp;
 
 
-//configuration
-//EEPROM
-	virtual void loadConfig(xPL_Eeprom& eeprom);
-	virtual void storeConfig(xPL_Eeprom& eeprom);
-//Messages
-	virtual size_t printConfigList(Print& p);
-	virtual size_t printConfigCurrent(Print& p);
-	virtual void configure(xPL_Key& key);
+	size_t event(const xPL_Event& evt);
 
 public:
 	virtual bool connection() =0;
 	virtual bool begin() =0;
-	virtual bool sendMessage(xPL_Message& msg)=0;
-#ifdef XPL_HTML_SUPPORT
-	virtual bool sendHomePage()=0; 
-#endif
 
 };
 

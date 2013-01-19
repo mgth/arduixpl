@@ -125,73 +125,70 @@ void xPL_MacAddress::toArray(uint8_t* mac)
 	memcpy(mac,bin,6);
 }
 
-
-void xPL_AdapterEthernet::loadConfig(xPL_Eeprom& eeprom)
+size_t xPL_AdapterEthernet::event(const xPL_Event& evt)
 {
-	if (eeprom.isxPL())
+	size_t len=0;
+
+	switch(evt.id())
 	{
-		_mac.fromEeprom(eeprom);
-		_ip.fromEeprom(eeprom);
-		_mask.fromEeprom(eeprom);
-		_dhcp=eeprom.read();
-		begin();
+		case LOAD_CFG:
+			if (evt.eeprom().isxPL())
+			{
+				_mac.fromEeprom(evt.eeprom());
+				_ip.fromEeprom(evt.eeprom());
+				_mask.fromEeprom(evt.eeprom());
+				_dhcp=evt.eeprom().read();
+				begin();
+			}
+			else
+			{
+				_mac.setRandom();
+				_dhcp = true;
+				begin();
+			}
+			break;
+
+		case STORE_CFG:
+			_mac.toEeprom(evt.eeprom());
+			_ip.toEeprom(evt.eeprom());
+			_mask.toEeprom(evt.eeprom());
+			evt.eeprom().write(_dhcp);
+			break;
+
+		case CFG_LIST:
+			//len += xPL_Adapter::printConfigListTo(p);
+
+			len += xPL_Message::printOptionKeyTo(evt.print(), S(mac_address) );
+			len += xPL_Message::printOptionKeyTo(evt.print(), S(ip_address) );
+			len += xPL_Message::printOptionKeyTo(evt.print(), S(ip_mask) );
+			len += xPL_Message::printOptionKeyTo(evt.print(), S(dhcp) );
+			break;
+
+		case CFG_CURRENT:
+			//len += xPL_Adapter::printConfigCurrentTo(p);
+
+			len += xPL_Message::printKeyTo( evt.print(), S(mac_address), &_mac );
+			len += xPL_Message::printKeyTo( evt.print(), S(ip_address) , &_ip  );
+			len += xPL_Message::printKeyTo( evt.print(), S(ip_mask),     &_mask);
+			len += xPL_Message::printKeyTo( evt.print(), S(dhcp), _dhcp?S(on):S(off) );
+			break;
+
+		case CONFIGURE:
+			{
+				xPL_Key& key = evt.key();
+
+				if      (key.id == S(mac_address)) { _mac.fromString(key.value); }
+				else if (key.id == S(ip_address))  { _ip.fromString(key.value); }
+				else if (key.id == S(ip_address))   { _mask.fromString(key.value); }
+				else if (key.id == S(dhcp)) { _dhcp = key.value.toBool(); }
+			}
+			//xPL_Adapter::configure(key);
+			break;
+		default:
+			break;
 	}
-	else
-	{
-		_mac.setRandom();
-		_dhcp = true;
-		begin();
-	}
-}
 
-
-void xPL_AdapterEthernet::storeConfig(xPL_Eeprom& eeprom)
-{
-	_mac.toEeprom(eeprom);
-	_ip.toEeprom(eeprom);
-	_mask.toEeprom(eeprom);
-	eeprom.write(_dhcp);
-}
-
-size_t xPL_AdapterEthernet::printConfigList(Print& p) {
-	int l = xPL_Adapter::printConfigList(p);
-
-	l += xPL_Message::printOptionKeyTo(p, S(mac_address) );
-	l += xPL_Message::printOptionKeyTo(p, S(ip_address) );
-	l += xPL_Message::printOptionKeyTo(p, S(ip_mask) );
-	l += xPL_Message::printOptionKeyTo(p, S(dhcp) );
-	return l;
-};
-
-size_t xPL_AdapterEthernet::printConfigCurrent(Print& p) {
-	int l= xPL_Adapter::printConfigCurrent(p);
-
-	l += xPL_Message::printKeyTo( p, S(mac_address), &_mac );
-	l += xPL_Message::printKeyTo( p, S(ip_address) , &_ip  );
-	l += xPL_Message::printKeyTo( p, S(ip_mask),     &_mask);
-	l += xPL_Message::printKeyTo( p, S(dhcp), _dhcp?S(on):S(off) );
-	return l;
-};
-
-void xPL_AdapterEthernet::configure(xPL_Key& key)
-{
-	if (key.id == S(mac_address))
-	{
-		_mac.fromString(key.value);
-	}
-	else if  (key.id == S(ip_address))
-	{
-		_ip.fromString(key.value);
-	}
-	else if (key.id == S(ip_address))
-	{
-		_mask.fromString(key.value);
-	}
-	else if (key.id == S(dhcp))
-	{
-		_dhcp = key.value.toBool();
-	}
-	xPL_Adapter::configure(key);
+	return len;
 }
 
 

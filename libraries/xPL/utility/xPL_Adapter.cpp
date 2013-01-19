@@ -23,8 +23,3 @@
 
 #include "xPL_Adapter.h"
 
-void xPL_Adapter::reg()
-{
-	xPL_Schema::reg();
-	xPL.setAdapter(this);
-}

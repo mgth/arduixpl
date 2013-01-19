@@ -31,38 +31,28 @@
 
 class xPL_Group:public xPL_Node {
 private:
-	xPL_String _group;
+	VString _group;
 protected:
-	virtual bool checkTargeted(xPL_Message& msg);
-	virtual bool msgAddConfigCurrent(xPL_Message& msg);
-	virtual size_t printTo(Print& p) const;
+	virtual size_t event(const xPL_Event& evt);
+	size_t printTo(Print& p) const;
 public:
-	xPL_Group(const xPL_String& s);
-	virtual bool storeConfig(xPL_Eeprom& eeprom);
-
+	xPL_Group(const VString& s);
 };
 
 class xPL_SchemaGroup:public xPL_Schema {
+private:
+	bool _deteteFirst;
+
 protected:
-	virtual const prog_char* className() const { return S(group); }
+	virtual const __FlashStringHelper* className() const { return S(group); }
 
-	virtual xPL_Node* add(const xPL_String& id) { return addChild(new xPL_Group(id)); }
+	virtual xPL_Node* add(const VString& id) { return addChild(new xPL_Group(id)); }
 
-	virtual bool checkTargeted(xPL_Message& msg) { return true; }
-	virtual bool msgAddConfigCurrent(xPL_Message& msg);
-	virtual bool msgAddConfigList(xPL_Message& msg);
-	virtual bool configure(xPL_Key& key);
-
-	virtual bool storeConfig(xPL_Eeprom& eeprom);
+	virtual size_t event(const xPL_Event& evt);
 
 };
 
 extern xPL_SchemaGroup xplGroup;
 
-#ifndef XPL_BEGIN
-#define XPL_BEGIN ;
-#endif
-
-#define XPL_BEGIN XPL_BEGIN##xplGroup.reg();
 
 #endif

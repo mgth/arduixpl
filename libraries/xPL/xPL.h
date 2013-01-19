@@ -30,6 +30,8 @@ class xPL_Adapter;
 #include "utility/xPL_Message.h"
 #include "utility/xPL_Node.h"
 
+
+
 class xPL_Main:public xPL_NodeParent
 {
  private:
@@ -39,25 +41,14 @@ class xPL_Main:public xPL_NodeParent
 		bool deleteFilters :1;
 	} _state;
 
-	 xPL_Adapter* _adapter;
 	 xPL_Address _source;
 	 VString _oldId;
 
-protected:
-
-	virtual void checkTargeted(xPL_MessageIn& msg);
-
-//configuration
-//EEPROM
-	virtual void loadConfig(xPL_Eeprom& epprom);
-	virtual void storeConfig(xPL_Eeprom& epprom);
-
-//Messages
-	virtual size_t printConfigList(Print& p);
-	virtual size_t printConfigCurrent(Print& p);
-
 
 public:
+	virtual size_t event(const xPL_Event& evt);
+
+
 #ifdef XPL_SLOWDEBUG
 	virtual void loop();
 #endif
@@ -80,15 +71,12 @@ public:
 	bool configured();
 	bool oldConfigured();
 
-	void setAdapter(xPL_Adapter* adapter);
-
 	bool attachInterrupt(int8_t pin, int mode);
 	bool detachInterrupt(int8_t pin);
 
 	static void xplInterrupt(uint8_t pin);
 #if defined (__AVR_ATmega328P__)|| defined(__AVR_ATmega168P__) || defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)|| defined(__AVR_ATmega32U4__)	static void xplInterrupt0();	static void xplInterrupt1();#endif#if defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__) || defined(__AVR_ATmega32U4__)	static void xplInterrupt2();	static void xplInterrupt3();#endif#if defined (__AVR_ATmega1280__)|| defined(__AVR_ATmega2560__)	static void xplInterrupt4();	static void xplInterrupt5();#endif
 	bool receivedMessage(VString& buffer);
-	bool sendMessage(xPL_Message& msg); 
  
 	void storeConfig();
 

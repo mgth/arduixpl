@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,7 +17,9 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified Jan 18, 2013 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
 
 #include <xPL.h>
@@ -41,69 +43,75 @@ void xPL_Hbeat::sendHbeat(const __FlashStringHelper* type) {
 	xPL_Hbeat_Message(*this).send();
 }
 
-size_t xPL_Hbeat_Message::printContentTo(Print& p) const {	return ((xPL_Hbeat*)_node)->printConfigCurrent(p);}size_t xPL_HbeatEnd_Message::printContentTo(Print& p) const { return 0; }
 
-size_t xPL_Hbeat::printConfigList(Print& p) {
+size_t xPL_Hbeat_Message::printContentTo(Print& p) const {	return ((xPL_Hbeat*)_node)->event(xPL_Event(CFG_CURRENT,&p));}size_t xPL_HbeatEnd_Message::printContentTo(Print& p) const { return 0; }
 
-	return xPL_Message::printOptionKeyTo(p,S(interval) );
-};
-
-size_t xPL_Hbeat::printConfigCurrent(Print& p) {
-
-	return xPL_Message::printKeyTo(p,S(interval),(int)intervalMinutes() );
-};
-
-void xPL_Hbeat::configure(xPL_Key& key)
+size_t xPL_Hbeat::event(const xPL_Event& evt)
 {
-	if (key.id == S(interval))
+	size_t len=0;
+	switch(evt.id())
 	{
-		//uint16_t val = (uint16_t) ((key.sValue().toInt()));
+/***********************************************
+  LOOP
+************************************************/
+		case LOOP:
+			if (xPL.oldId())
+			{
+				sendHbeat(S(end));
+				xPL.oldId().clear();
+			}
 
-		setIntervalMinutes( xPL_Int(key.value) );
+			// if it's time to or trigged, send heartbeat
+			if ( _trigHbeat || (millis()-_lastHbeatTime)>=interval() ) {
+				sendHbeat(S(basic));
+			}
+			break;
+/***********************************************
+  PARSE INCOMING MESSAGES
+************************************************/
+		case PARSE_MESSAGE:
+			if ( evt.messageIn().schema.instance == S(request) )
+			{
+				if (evt.messageIn().key_command() == S(request))
+				{
+					_trigHbeat=true;
+				}
+			}
+			break;
+
+/***********************************************
+  CONFIG
+************************************************/
+		case CFG_LIST:
+			len += xPL_Message::printOptionKeyTo(evt.print(),S(interval) );
+			break;
+		case CFG_CURRENT:
+			len += xPL_Message::printKeyTo(evt.print(),S(interval),(int)intervalMinutes() );
+			break;
+
+/*---------------------------------------------*/
+		case CONFIGURE:
+			if (evt.key().id == S(interval))
+			{
+				setIntervalMinutes( xPL_Int(evt.key().value) );
+			}
+			break;
+
+		case LOAD_CFG:
+			if (evt.eeprom().isxPL())
+				evt.eeprom().readAny(_interval);
+			else
+				_interval = XPL_HBEAT_INTERVAL;
+
+			_trigHbeat = true;
+			break;
+
+		case STORE_CFG:
+			evt.eeprom().writeAny(_interval);
+			break;
+/*---------------------------------------------*/
+		default:
+			break;
 	}
-	return xPL_Schema::configure(key);
-}
-
-void xPL_Hbeat::loop() {
-
-	// send config.end/hbeat.end message when renaming instance
-	if (xPL.oldId())
-	{
-		sendHbeat(S(end));
-		xPL.oldId().clear();
-	}
-
-	// if it's time to or trigged, send heartbeat
-	if ( _trigHbeat || (millis()-_lastHbeatTime)>=interval() ) {
-		sendHbeat(S(basic));
-	}
-}
-
-void xPL_Hbeat::parseMessage(xPL_MessageIn& msg)
-{
-	if ( msg.schema.instance == S(request) )
-	{
-		if (msg.key_command() == S(request))
-		{
-			trigHbeat();
-		}
-	}
-}
-
-/*****************************************
-EEPROM
-*****************************************/
-void xPL_Hbeat::loadConfig(xPL_Eeprom& eeprom)
-{
-	if (eeprom.isxPL())
-		eeprom.readAny(_interval);
-	else
-		_interval = XPL_HBEAT_INTERVAL;
-
-	trigHbeat();
-}
-
-void xPL_Hbeat::storeConfig(xPL_Eeprom& eeprom)
-{
-	eeprom.writeAny(_interval);
+	return len;
 }

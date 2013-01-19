@@ -3,84 +3,95 @@ xPL_SchemaGroup xplGroup;
 
 bool isGroup(const xPL_Address& addr)
 {
-	if (addr.vendor != S(xpl)) return false; //98
-	if (addr.device != S(group)) return false;//56
+	if (addr.vendor != S(xpl)) return false;
+	if (addr.device != S(group)) return false;
 	return true;
 }
 
-
-bool xPL_SchemaGroup::configure(xPL_Key& key) {
-	if ( key != S(group) ) return false;
-
-	if (xPL.deleteGroups(false)) { deleteChilds(); }
-
-	xPL_Address addr;
-	addr.parse(key.sValue());
-
-	if (isGroup(addr))
+size_t xPL_SchemaGroup::event(const xPL_Event& evt)
+{
+	switch(evt.id())
 	{
-		addChild(new xPL_Group(addr.instance));
-		xPL.trigHbeat();
+/***********************************************
+  LOOP
+************************************************/
+		case LOOP:
+			_deteteFirst=true;
+			return 0;
+/***********************************************
+  CONFIG
+************************************************/
+		case CFG_LIST:
+			return xPL_Message::printOptionKeyTo(evt.print(),S(group), XPL_MAX_GROUPS);
+
+		case CFG_CURRENT:
+			if(!child()) return xPL_Message::printKeyTo(evt.print(),S(group),F("") );
+		case CHK_TARGETED:
+			return sendEvent(evt);
+/*---------------------------------------------*/
+		case CONFIGURE:
+			{
+				if ( evt.key().id != S(group) ) return 0;
+
+				if (_deteteFirst) { deleteChilds(); _deteteFirst=false; }
+
+				xPL_Address addr;
+				addr.parse(evt.key().value);
+
+				if (isGroup(addr))
+				{
+					addChild(new xPL_Group(addr.instance));
+	//				xPL.trigHbeat(); //TODO
+				}
+			}
+			return 0;
+		case STORE_CFG:
+			return sendEvent(evt) + evt.eeprom().write(0);
+
+/*---------------------------------------------*/
+		default:
+			break;
 	}
-	return false;
+	return 0;
 }
 
-bool xPL_SchemaGroup::msgAddConfigList(xPL_Message& msg)
+size_t xPL_Group::event(const xPL_Event& evt)
 {
-	msg.addOptionKey(S(group), XPL_MAX_GROUPS);
-	return false;
+	size_t len = 0;
+	switch(evt.id())
+	{
+		case CHK_TARGETED:
+		{
+			xPL_Address& target = evt.messageIn().target;
+
+			if ( isGroup(target) && target.instance == _group )
+				evt.messageIn().setTargeted();
+		}
+		case CFG_CURRENT:
+			len += xPL_Message::printKeyTo(evt.print(),S(group));
+			len += printTo(evt.print());
+			break;
+
+		case STORE_CFG:
+			return _group.printlnTo(evt.eeprom(),'\0');
+
+		default:
+			break;
+	}
+	return len;
 }
 
-bool xPL_SchemaGroup::msgAddConfigCurrent(xPL_Message& msg)
+
+xPL_Group::xPL_Group(const VString& s)
 {
-	if(child()) return true;
-	msg.addKey( S(group),(xPL_Printable*)NULL );
-	return false;
+	_group = s;
+	_group.load();
 }
-
-bool xPL_Group::msgAddConfigCurrent(xPL_Message& msg)
-{
-	msg.addKey( S(group),this );
-	return false;
-}
-
-xPL_Group::xPL_Group(const xPL_String& s)
-{
-	_group.load(s);
-}
-
-bool xPL_Group::checkTargeted(xPL_Message& msg)
-{
-	xPL_Address& target = msg.target;
-
-	if ( isGroup(target) && target.instance == _group ) msg.setTargeted();
-	
-	return false;
-}
-
 
 
 size_t xPL_Group::printTo(Print& p) const {
-	xPL_Address addr;
-	addr.vendor = S(xpl);
-	addr.device = S(group);
-	addr.instance = _group;
-	return addr.printTo(p);
+	//return xPL_Address(S(xpl),S(group),_group).printTo(p);
+	//return p.print(S(xpl)) + p.print('-') + p.print(S(group)) + p.print('.') + _group.printTo(p);
+	return p.print(F("xpl-group.")) + _group.printTo(p);
 }
 
-/*****************************************
-EEPROM
-*****************************************/
-
-bool xPL_SchemaGroup::storeConfig(xPL_Eeprom& eeprom)
-{
-	sendEvent(&xPL_Node::storeConfig,eeprom,true);
-	eeprom.write(0);
-	return false;
-}
-
-bool xPL_Group::storeConfig(xPL_Eeprom& eeprom)
-{
-	_group.printlnTo(eeprom,'\0');
-	return false;
-}

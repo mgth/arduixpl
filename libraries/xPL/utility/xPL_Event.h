@@ -20,20 +20,35 @@
 	  Modified Dec 23, 2012 by Mathieu GRENET
 */
 
-#ifndef XPLSCHEMA_H
-#define XPLSCHEMA_H
+#ifndef XPL_EVENT_H
+#define XPL_EVENT_H
 
-#include <xPL.h>
+#include "xPL_Define.h"
+#include "VString.h"
 
-class xPL_Schema : public xPL_NodeParent
+class xPL_Message;
+class xPL_MessageIn;
+class xPL_Key;
+class xPL_Eeprom;
+
+enum eventId {LOOP,PARSE_MESSAGE,CHK_TARGETED,SEND_MESSAGE,CFG_LIST,CFG_CURRENT,CONFIGURE,STORE_CFG,LOAD_CFG,INTERRUPT};
+
+class xPL_Event
 {
-protected:
-//	virtual size_t event(xPL_Event& evt);
-	virtual bool targeted(xPL_MessageIn& msg) const;
-	
-public:
+eventId _id;
+const void* _obj;
 
-	virtual void reg();
-	virtual xPL_Schema* schema();
+public:
+	eventId id() const { return _id; }
+	xPL_Event(eventId id, void* obj=NULL):_id(id),_obj(obj) {}
+
+	xPL_Message& message() const { return *(xPL_Message*)_obj; }
+	xPL_MessageIn& messageIn() const { return *(xPL_MessageIn*)_obj; }
+	xPL_Key& key() const { return *(xPL_Key*)_obj; }
+	xPL_Eeprom& eeprom() const { return *(xPL_Eeprom*)_obj; }
+	Print& print() const { return *(Print*)_obj; }
 };
+
+
+
 #endif

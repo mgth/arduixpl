@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,7 +17,9 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified Jan 18, 2013 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
 
 #include "xPL_Message.h"
@@ -33,15 +35,10 @@ xPL_Key::xPL_Key(VString&  buffer)
 
 void xPL_Key::parse(VString& buffer)
 { 
-//	printMemLCD(); delay(1000);
-
 	id = buffer;
-
 	buffer = id.parseTo('\n');
-
 	value = id.parseTo('=');
 }
-
 
 size_t xPL_Key::printTo(Print& p) const {
 
@@ -191,7 +188,7 @@ size_t xPL_Message::printContentTo(Print& p) const {	return 0;	//	return xPL_C
 
 
 bool xPL_Message::send(){
-	return xPL.sendMessage(*this);
+	return xPL.event(xPL_Event(SEND_MESSAGE,this));
 }
 
 /********************************************************************
@@ -342,10 +339,4 @@ bool xPL_MessageIn::parseContent() //390
 bool xPL_MessageIn::parse() { 
 	return (parseHeader() && parseContent());
 }
-/*
-size_t xPL_MessageIn::printTo(Print& p) const
-{
-	if (_message) return p.print(_message);
-	return 0;
-}
-*/
+

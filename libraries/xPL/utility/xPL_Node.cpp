@@ -132,6 +132,16 @@ void xPL_Node::sendEvent (const xPL_Event& evt, bool childsOnly, bool all)
 	}
 }
 */
+
+size_t xPL_Node::sendEvent(const xPL_Event& evt)
+{
+	size_t len =0;
+	xPL_Node* n = child();
+	while(n) { len += n->event(evt); n=n->next(); }
+	return len;
+}
+
+/*
 void xPL_Node::sendLoop()
 {
 	xPL_Node* n = child();
@@ -179,12 +189,20 @@ void xPL_Node::sendInterrupt (uint8_t pin, unsigned long time)
 	while(n) { n->interrupt(pin,time); n=n->next(); }
 }
 
-
-
-/*
-void xPL_Node::sendEventConst (const xPL_Event& evt, bool childsOnly, bool all) const
+size_t xPL_Node::sendPrintConfigListTo (Print& p)
 {
-	const_cast<xPL_Node*>(this)->sendEvent(evt,childsOnly,all);
+	size_t len=0;
+	xPL_Node* n = child();
+	while(n) { len+=n->printConfigListTo(p); n=n->next(); }
+	return len;
+}
+
+size_t xPL_Node::sendPrintConfigCurrentTo (Print& p)
+{
+	size_t len=0;
+	xPL_Node* n = child();
+	while(n) { len+=n->printConfigCurrentTo(p); n=n->next(); }
+	return len;
 }
 */
 /********************************************************************
@@ -197,14 +215,14 @@ xPL_Node* xPL_Node::readConfig(xPL_Eeprom& eeprom)
 	if (id) return findOrAdd(id);
 	return NULL;
 }
-
+/*
 void xPL_Node::loadConfig(xPL_Eeprom& eeprom)
 {
-/*	while ( xPL_Node* node = readConfig(eeprom))
+	while ( xPL_Node* node = readConfig(eeprom))
 	{
 		node->loadConfig(eeprom);
-	}*/
+	}
 }
 
 void xPL_Node::storeConfig(xPL_Eeprom& eeprom) { sendStoreConfig(eeprom); eeprom.write('\0'); }
-
+*/

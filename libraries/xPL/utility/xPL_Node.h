@@ -29,7 +29,8 @@
 #include "xPL_String.h"
 #include "xPL_BufferFiller.h"
 #include "xPL_Eeprom.h"
-//#include "xPL_Event.h"
+#include "xPL_Event.h"
+
 class xPL_Main;
 class xPL_Key;
 class xPL_Message;
@@ -43,7 +44,18 @@ class xPL_Schema;
 class xPL_NodeParent;
 #endif
 
-class xPL_Node : public Printable {
+class xPL_Interrupt
+{
+	byte _pin;
+	unsigned long _time;
+public:
+	xPL_Interrupt(byte pin, unsigned long time):_pin(pin),_time(time) {}
+	byte pin() {return _pin;}
+	unsigned long time() {return _time; }
+};
+
+
+class xPL_Node/* : public Printable*/ {
 protected: 
 	xPL_NodeParent* _parent;
 	xPL_Node* _next;
@@ -102,76 +114,18 @@ public:
 
 	int count() const;
 
-// events
-/*
-	void sendEvent(const xPL_Event& evt,bool childsOnly=false, bool all=false);
-	void sendEventConst(const xPL_Event& evt,bool childsOnly=false, bool all=false) const;
 
-	template<class cls> void sendEvent( bool(cls::*func)(),bool childsOnly=false, bool all=false)
-	{
-		xPL_EventFunction<cls> evt(func);
-		return sendEvent(evt,childsOnly,all);
-	}
-	template<class cls,class clsparam> void sendEvent( bool(cls::*func)(clsparam&),clsparam& param, bool childsOnly=false, bool all=false)
-	{
-		xPL_EventFunctionParam<cls,clsparam> evt(func,param);
-		return sendEvent(evt,childsOnly,all);
-	}
+	virtual xPL_Node* readConfig(xPL_Eeprom& eeprom);
 
-	template<class cls> void sendEvent( bool(cls::*func)(),bool(cls::*funcClose)(),bool childsOnly=false, bool all=false)
-	{
-		xPL_EventFunction<cls> evt(func,funcClose);
-		return sendEvent(evt,childsOnly,all);
-	}
-
-	template<class cls,class clsparam> void sendEvent( bool(cls::*func)(clsparam&),clsparam& param,bool(cls::*funcClose)(clsparam&),bool childsOnly=false, bool all=false)
-	{
-		xPL_EventFunctionParam<cls,clsparam> evt(func,funcClose);
-		return sendEvent(evt,childsOnly,all);
-	}
-
-
-
-	template<class cls> void sendEventConst( bool(cls::*func)(),bool childsOnly=false, bool all=false) const
-	{
-		xPL_EventFunction<cls> evt(func);
-		return sendEventConst(evt,childsOnly,all);
-	}
-*/
-
-
-	void sendLoop();
-	virtual void loop(){ sendLoop(); }
-
-	void sendParseMessage (xPL_MessageIn& msg);
-	virtual void parseMessage(xPL_MessageIn& msg) { }
-
-	void sendCheckTargeted (xPL_MessageIn& msg);
-	virtual void checkTargeted(xPL_MessageIn& msg) { }
-
-	void sendInterrupt (uint8_t pin, unsigned long time);
-	virtual void interrupt(uint8_t pin, unsigned long time) { sendInterrupt(pin,time); }
+	size_t sendEvent(const xPL_Event& evt);
+	virtual size_t event(const xPL_Event& evt){ return sendEvent(evt); }
 
 	void msgAddKey(const VString& key,const VString& value, bool alloc=false) const ;
 
-//Config
-	virtual xPL_Node* readConfig(xPL_Eeprom& eeprom);
-
-	void sendLoadConfig (xPL_Eeprom& eeprom);
-	virtual void loadConfig(xPL_Eeprom& eeprom);
-
-	void sendStoreConfig (xPL_Eeprom& eeprom);
-	virtual void storeConfig(xPL_Eeprom& eeprom);
-
-	void sendConfigure (xPL_Key& key);
-	virtual void configure(xPL_Key& key) { }
-
-	virtual size_t printConfigList(Print& p) { return 0; }
-	virtual size_t printConfigCurrent(Print& p) { return 0; }
 //Printable
-	virtual size_t printTo(Print& p) const {
+/*	virtual size_t printTo(Print& p) const {
 			return 0;
-	}
+	}*/
 
 };
 

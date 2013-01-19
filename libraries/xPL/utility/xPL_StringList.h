@@ -110,6 +110,15 @@
 
 	//control
 	C(control)
+	C(enable)
+	C(disable)
+	C(high)
+	C(low)
+	C(toggle)
+	C(inc)
+	C(dec)
+	C(set)
+	C(data1)
 
 	//Lighting
 	C(lighting)

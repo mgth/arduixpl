@@ -29,7 +29,7 @@
 class xPL_Key: public xPL_Node {
 protected:
 public:
-	virtual const __FlashStringHelper* className() const { return S(message); }	
+//	virtual const __FlashStringHelper* className() const { return S(message); }	
 	VString id;
 	VString value;
 
@@ -38,20 +38,13 @@ public:
 	xPL_Key(VString& buffer);
 	xPL_Key(xPL_Key* key);
 	xPL_Key() {};
-	xPL_Key(const VString& key,const VString&  val)
-	{ 
-		id=key;
-		value=val;
-	}
+	xPL_Key(const VString& key,const VString&  val):id(key),value(val) {}
 
-
-	//printable
-	virtual size_t printTo(Print& p) const;
-
+	size_t printTo(Print& p) const;
 };
 
 
-class xPL_Address //: public Printable
+class xPL_Address
 {
 public:
 
@@ -60,19 +53,21 @@ public:
 	VString instance;
 
 	xPL_Address() {}
+	xPL_Address(const VString& v,const VString& d,const VString& i)
+		:vendor(v),device(d),instance(i){}
 	void parse(const VString& s);
-
-	size_t printTo(Print& p) const;
 
 	void setAny() { instance=S(_asterisk); vendor.clear(); device.clear(); }
 	bool isAny() { return instance.charAt(0)=='*'; } 
 
 	bool operator==(const xPL_Address& addr);
+
+	size_t printTo(Print& p) const;
 };
 
 
 
-class xPL_Message //: public Printable
+class xPL_Message 
 {
 protected:	xPL_Node* _node;public:
 	xPL_Message() {};
@@ -127,6 +122,7 @@ public:
 	VString getValue(const __FlashStringHelper* name);
 	xPL_Key* getKeyCopy(const __FlashStringHelper* name);
 
+	xPL_Key* keys() { return (xPL_Key*)_keys.child(); }
 
 	bool parseHeader();
 	bool parseContent();

@@ -27,16 +27,21 @@
 #include <xPL.h>
 #include "utility/xPL_Hbeat.h"
 
+class xPL_MessageConfigList : public xPL_Message
+{
+	size_t printContentTo(Print& p) const { return xPL.event(xPL_Event(CFG_LIST,&p)); }};
+
+class xPL_MessageConfigCurrent : public xPL_Message
+{
+	size_t printContentTo(Print& p) const { return xPL.event(xPL_Event(CFG_CURRENT,&p)); }};
+
+
 class xPL_Config : public xPL_Hbeat {
 private:
 		bool _configured; 
 
 protected:
-	virtual bool parseMessage(xPL_MessageIn& msg);
-
-	virtual bool configure(xPL_Key& key);
-	virtual bool loadConfig(xPL_Eeprom& eeprom);
-	virtual bool loadDefaultConfig();
+	size_t event(const xPL_Event& evt);
 
 	bool sendConfig(const __FlashStringHelper* type) const;
 

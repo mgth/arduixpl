@@ -22,9 +22,10 @@
 
 #include "xPL_Schema.h"
 
-void xPL_Schema::parseMessage(xPL_MessageIn& msg) { sendParseMessage(msg); }
-void xPL_Schema::configure(xPL_Key& key){}
 bool xPL_Schema::targeted(xPL_MessageIn& msg) const { return (msg.schema.device==className()); }
+
+
+
 
 void xPL_Schema::reg() {
 #ifdef xPL_Debug

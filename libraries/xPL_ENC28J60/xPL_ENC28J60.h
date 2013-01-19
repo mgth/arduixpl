@@ -43,8 +43,7 @@ public:
 	
 	virtual bool connection();
 
-	virtual void loop();
-	virtual bool sendMessage(xPL_Message& msg);
+	size_t event(const xPL_Event& evt);
 
 #ifdef XPL_HTML_SUPPORT
 	virtual bool sendHomePage(); 

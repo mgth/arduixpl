@@ -33,8 +33,6 @@ class xPL_Adapter:public xPL_Schema
 
 public:
 	virtual const __FlashStringHelper* className() const { return S(adapter); }	
-	virtual bool sendMessage(xPL_Message& msg)=0; 
-	virtual void reg();
 };
 
 

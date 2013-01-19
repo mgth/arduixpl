@@ -500,36 +500,6 @@ public:
 };
 
 
-void xPL_ENC28J60::loop()
-{
-	if (!connection()) { return; }
-
-	size_t addr = gNextPacketPtr; 
-
-	word receiveLen = packetReceive();
-	if (!receiveLen) { return; }
-
-
-	drop(23); 
-
-	if ( readByte() == 0x11 ) // it is an UDP packet
-	{
-		drop(12);addr+=13;
-		
-		word udp_port=readWordLE();
-
-		if (udp_port == XPL_PORT)
-		{
-			DBG(F("<ENC28J60 xPL>"),receiveLen);
-
-			VString msg(addr + 35,receiveLen-42,VSHelperENC28J60::helper);
-
-			xPL.receivedMessage(msg);
-		}
-	}
-	packetRelease();
-}
-
 size_t printWord(Print& p, word w) { 
 	size_t len=0;
 
@@ -685,39 +655,79 @@ public:
 		DBG(F("send"),_len);
 	}
 };
-bool xPL_ENC28J60::sendMessage(xPL_Message& msg) {
+size_t xPL_ENC28J60::event(const xPL_Event& evt) {
 
-	size_t datalen = msg.len();
-
-	DBG(F("<send_ENC28J60> "),datalen);
-
-	if (connection()) 
+	switch (evt.id()) 
 	{
-		checksum chk_ip;
-		checksum chk_udp;
-		encFiller filler;
+		default:
+			return xPL_AdapterEthernet::event(evt);
+		case LOOP:
+		{
+			if (!connection()) { return 0; }
 
-		printIP(chk_ip,20 + 8 + datalen);
-	//DBG(F("chk_ip "),chk_ip.len());
+			size_t addr = gNextPacketPtr; 
+
+			word receiveLen = packetReceive();
+			if (!receiveLen) { return 0; }
 
 
-	for (byte i=0;i<4;i++) chk_udp.print('\0');
-	for (byte i=0; i<4; i++) chk_udp.print('\xFF');
-		printUDP(chk_udp, msg, 8 + datalen);
+			drop(23); 
 
-	//DBG(F("chk_udp "),chk_udp.len());
+			if ( readByte() == 0x11 ) // it is an UDP packet
+			{
+				drop(12);addr+=13;
+		
+				word udp_port=readWordLE();
 
-		filler.start(14 + 20 + 8 + datalen);
+				if (udp_port == XPL_PORT)
+				{
+					DBG(F("<ENC28J60 xPL>"),receiveLen);
 
-		printETH(filler);
-		printIP(filler,20 + 8 + datalen,chk_ip.sum());
-		printUDP(filler, msg, 8 + datalen ,chk_udp.sum_udp());
+					VString msg(addr + 35,receiveLen-42,VSHelperENC28J60::helper);
 
-		filler.send();
+					xPL.event(xPL_Event(PARSE_MESSAGE,&msg));
+				}
+			}
+			packetRelease();
+			break;
+		}
+		case SEND_MESSAGE:
+		{
+			xPL_Message& msg = evt.message();
 
-		return true;
+			size_t datalen = msg.len();
+
+			DBG(F("<send_ENC28J60> "),datalen);
+
+			if (connection()) 
+			{
+				checksum chk_ip;
+				checksum chk_udp;
+				encFiller filler;
+
+				printIP(chk_ip,20 + 8 + datalen);
+			//DBG(F("chk_ip "),chk_ip.len());
+
+
+			for (byte i=0;i<4;i++) chk_udp.print('\0');
+			for (byte i=0; i<4; i++) chk_udp.print('\xFF');
+				printUDP(chk_udp, msg, 8 + datalen);
+
+			//DBG(F("chk_udp "),chk_udp.len());
+
+				filler.start(14 + 20 + 8 + datalen);
+
+				printETH(filler);
+				printIP(filler,20 + 8 + datalen,chk_ip.sum());
+				printUDP(filler, msg, 8 + datalen ,chk_udp.sum_udp());
+
+				filler.send();
+
+				return datalen;
+			}
+			return 0;
+		}
 	}
-	return false;
 }
 
 word xPL_ENC28J60::packetReceive() {

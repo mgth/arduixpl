@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,104 +17,88 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified Jan 18, 2013 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
 
 #include "xPL_Config.h"
 
 xPL_Config xplConfig;
 
-bool xPL_Config::configure(xPL_Key& key)
+size_t xPL_Config::event(const xPL_Event& evt)
 {
-	if (key.id == S(newconf))
+	switch(evt.id())
 	{
-		VString& value = key.value;
-
-		if ( xPL.source().instance == value || xPL.setId(value) )
-		{
-			_configured=true;
-		}
-		_trigHbeat = true;
-		return false; // just mean not to configure childs with that key
-	}
-	return true;
-}
-
-/*****************************************
-EEPROM
-*****************************************/
-bool xPL_Config::loadDefaultConfig()
-{
-	_interval = XPL_CONFIG_INTERVAL;
-	_trigHbeat = true;
-	_configured = false;
-	return false;
-}
-bool xPL_Config::loadConfig(xPL_Eeprom& eeprom)
-{
-	xPL_Hbeat::loadConfig(eeprom);
-	xPL.setConfigured(true);
-
-	_trigHbeat = true;
-	return false;
-}
-
-
-
-
-bool xPL_Config::parseMessage(xPL_MessageIn& msg)
-{
-	if ( msg.schema.schType() == S(list) || msg.schema.schType() == S(current) )
-	{
-		if (msg.key_command() == S(request))
-		{
-			msg.deleteChilds(); //to free memory before sending
-
-			if ( msg.schema.schType() == S(list) )
-				sendConfig(S(list));
-			else
-				sendConfig(S(current));
-
-		}
-		return false;
-	}
+/***********************************************
+  PARSE INCOMING MESSAGES
+************************************************/
+		case PARSE_MESSAGE:
+/*---------------------------------------------
+config.request
+-----------------------------------------------*/
+			if ( evt.messageIn().schema.instance == S(list) || evt.messageIn().schema.instance == S(current) )
+			{
+				if (evt.messageIn().key_command() == S(request))
+				{
+					if ( evt.messageIn().schema.instance == S(list) )
+						xPL_MessageConfigList().send();
+					else
+						xPL_MessageConfigCurrent().send();
+				}
+				return 0;
+			}
 	
-	if ( msg.schema.schType() == S(response) )
-	{
-		if (msg.parseContent())
-		{
-			xPL.deleteGroups();
-			xPL.deleteFilters();
+/*---------------------------------------------
+config.response
+-----------------------------------------------*/
+			if ( evt.messageIn().schema.instance == S(response) )
+			{
+				if (evt.messageIn().parseContent())
+				{
+					xPL_Key* k = evt.messageIn().keys();
+					while(k) {
+						xPL.event(xPL_Event(CONFIGURE, k ));
+						k = (xPL_Key*)k->next();
+					}
+					xPL.storeConfig();
+				}
+				return 0;
+			}
+			break;
+/***********************************************
+  CONFIG
+************************************************/
+		case CONFIGURE:
+			if (evt.key().id == S(newconf))
+			{
+				VString& newconf = evt.key().value;
 
-			msg.sendEvent(&xPL_Key::sendEventConfigure,true);
-
-			xPL.deleteGroups(false);
-			xPL.deleteFilters(false);
-
-			xPL.storeConfig();
-
-		}
-		return false;
+				if ( xPL.source().instance == newconf || xPL.setId(newconf) )
+				{
+					_configured=true;
+				}
+				_trigHbeat = true;
+				return 0;
+			}
+			break;
+/*---------------------------------------------*/
+		case LOAD_CFG:
+			if (evt.eeprom().isxPL())
+			{
+				evt.eeprom().readAny(_interval);
+				_configured = true;
+			}
+			else
+			{
+				_interval = XPL_CONFIG_INTERVAL;
+				_configured = false;
+			}
+			_trigHbeat = true;
+			return 0;
+/*---------------------------------------------*/
+		default:
+			break;
 	}
-
-
-	return false;
+	return xPL_Hbeat::event(evt);
 }
-
-
-bool xPL_Config::sendConfig(const __FlashStringHelper* type) const
-{
-	xPL_Message msg(S(stat),S(config),type);
-
-	if ( type == S(list) )
-	{
-		xPL.sendEvent(&xPL_Node::msgAddConfigList,msg);
-	}
-	else
-	{
-		xPL.sendEvent(&xPL_Node::msgAddConfigCurrent,msg);
-	}
-	return msg.send();
-
-}
-

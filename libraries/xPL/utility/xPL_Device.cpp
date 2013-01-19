@@ -19,21 +19,14 @@
 
 	  Modified Dec 23, 2012 by Mathieu GRENET
 */
+#include "xPL_Device.h"
 
-#ifndef XPLSCHEMA_H
-#define XPLSCHEMA_H
-
-#include <xPL.h>
-
-class xPL_Schema : public xPL_NodeParent
+bool xPL_Device::targeted(xPL_MessageIn& msg) const
 {
-protected:
-//	virtual size_t event(xPL_Event& evt);
-	virtual bool targeted(xPL_MessageIn& msg) const;
-	
-public:
+	if (msg.key_device() != id) return false;
 
-	virtual void reg();
-	virtual xPL_Schema* schema();
-};
-#endif
+	VString s = msg.key_type();
+	if (!s) return true;
+	if (s==className()) return true;
+	return false;
+}
