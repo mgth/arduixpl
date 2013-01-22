@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,9 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
-
 
 #include "xPL_AdapterW5100.h"
 
@@ -27,7 +28,7 @@ xPL_AdapterW5100 xplAdapter;
 
 bool xPL_AdapterW5100::begin()
 {
-	
+#ifdef XPL_IP	
 #ifdef XPL_DHCP
 	if (_dhcp && Ethernet.begin(_mac.bin))
 	{
@@ -41,10 +42,12 @@ bool xPL_AdapterW5100::begin()
 #else
 	for (byte i=0;i<4;i++) { _ip.bin[i] = 0;_mask.bin[i] = 0; }
 	Ethernet.begin(_mac.bin,_ip.bin,INADDR_NONE,INADDR_NONE,_mask.bin);
-
+#endif
+	DBG(F("IP:"),_ip);
+#else
+	Ethernet.begin(_mac.bin,IPAddress(0,0,0,0),INADDR_NONE,INADDR_NONE,IPAddress(255,255,255,255));
 #endif
 
-	DBG(F("IP:"),_ip);
 
 	return _udp.begin(XPL_PORT);
 }
@@ -65,8 +68,9 @@ void xPL_AdapterW5100::loop() {
 
 			if (len)
 			{
-				VString msg(buffer);
-				xPL.receivedMessage(msg);
+				VString s(buffer);
+				xPL_MessageIn msg(s);
+				xPL.parseMessage(msg);
 			}
 		}
 
@@ -76,8 +80,6 @@ void xPL_AdapterW5100::loop() {
 
 bool xPL_AdapterW5100::sendMessage(xPL_Message& msg)
 {
-
-	
 #ifdef XPL_DEBUG
 	DBG(F("<send_W5100>"),);
 	msg.printTo(Serial);
@@ -87,9 +89,12 @@ bool xPL_AdapterW5100::sendMessage(xPL_Message& msg)
 	{
 		//uint8_t ip[4]={ 0xFF, 0xFF, 0xFF, 0xFF};
 
+#ifdef XPL_IP
 		IPAddress ip;
 		for (byte i=0;i<4;i++) { ip[i]= (_ip.bin[i]&_mask.bin[i]) | (~_mask.bin[i]); } // TODO : maybe broadcast could be stored
-
+#else
+		IPAddress ip(255,255,255,255);
+#endif
 		DBG(F("dest:"),ip);
 
 		_udp.beginPacket(ip, XPL_PORT);
@@ -133,41 +138,6 @@ bool xPL_AdapterW5100::connection()
   }*/
   return true;
 }
-
-#ifdef XPL_HTML_SUPPORT
-
-bool xPL_AdapterEthernet::sendHomePage() {
-/*
-	if (!_state==XA_STATE_READY) return false;
-
-  _bfill = ether.tcpOffset();
-  _bfill.emit_p(PSTR(
-  "HTTP/1.0 200 OK\r\n"
-    "Content-Type: text/html\r\n"
-    "Pragma: no-cache\r\n"
-    "\r\n"
-    "<title>xPL</title>"
-    "<h1>xPL $F-$F.$S</h1>"
-//    "<p>..TODO: some state here..</p>"
-    ),
-	VendorID(),
-	DeviceID(),
-	_source
-	);
-  xPL_Schema* sch = _schema;
-  while (sch)
-  {
-	  _bfill.emit_p(PSTR(
-	  "<li>$F</li>"),
-	  sch->Family()
-	  );
-	  sch=sch->next();
-  }
-  ether.httpServerReply(_bfill.position()); // send web page data
-  */
-  return true;
-}
-#endif
 
 
 

@@ -4,9 +4,9 @@
 #define _XPL_SENSORULTRASONIC_H
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
+	#include <Arduino.h>
 #else
-	#include "WProgram.h"
+	#include <WProgram.h>
 #endif
 
 #include "../xPL_Sensor/xPL_Sensor.h"#include "../xPL/utility/VString.h"class xPL_SensorUltrasonic:public xPL_SensorGeneric {

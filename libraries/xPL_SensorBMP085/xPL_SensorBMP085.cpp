@@ -1,7 +1,3 @@
-// 
-// 
-// 
+/*  ArduixPL - xPL for arduino  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.  This file is part of ArduixPL.    ArduixPL is free software: you can redistribute it and/or modify    it under the terms of the GNU General Public License as published by    the Free Software Foundation, either version 3 of the License, or    (at your option) any later version.    ArduixPL is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.    You should have received a copy of the GNU General Public License    along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.	  Modified 2013-1-22 by Mathieu GRENET 	  mailto:mathieu@mgth.fr	  http://www.mgth.fr*/#include "xPL_SensorBMP085.h"
 
-#include "xPL_SensorBMP085.h"
-
-xPL_SensorBMP085::xPL_SensorBMP085(const VString & tName, const VString & pName){	_temp.setId(tName);	_temp.setBuffer(10);	_pressure.setId(pName);	_pressure.setBuffer(10);	_pressure.setThreshold(25);	addChild(&_temp);	addChild(&_pressure);	_bmp085.begin(); // TODO : set mode configurable}void xPL_SensorBMP085::loop(){			if (millis()-_time<2000) return;	_temp.setValue(_bmp085.readTemperature());	_pressure.setValue(_bmp085.readPressure());	_time = millis();}
+xPL_SensorBMP085::xPL_SensorBMP085(const VString & tName, const VString & pName){	_temp.setId(tName);	_temp.setBuffer(10);	_pressure.setId(pName);	_pressure.setBuffer(10);	_pressure.setThreshold(25);	addChild(&_temp);	addChild(&_pressure);	_bmp085.begin(); // TODO : set mode configurable}void xPL_SensorBMP085::loop(){		if (millis()-_time<2000) return;		_temp.setValue(_bmp085.readTemperature());		_pressure.setValue(_bmp085.readPressure());		_time = millis();}

@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,10 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
-
-
 #ifndef XPL_MESSAGE_H
 #define XPL_MESSAGE_H
 
@@ -81,7 +81,7 @@ class xPL_Message
 	static size_t printOptionKeyTo(Print& p, const __FlashStringHelper* value);
 	static size_t printOptionKeyTo(Print& p, const __FlashStringHelper* value,int index);
 
-	bool send();
+	size_t send();
 
 	size_t printTo(Print& p) const;
 	size_t len() { nullPrinter p; return printTo(p); }

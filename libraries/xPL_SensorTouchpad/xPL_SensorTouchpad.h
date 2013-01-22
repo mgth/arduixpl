@@ -64,7 +64,7 @@ class xPL_SensorTouchpad : public xPL_Node {
 
 protected:
 //	virtual const __FlashStringHelper* className() const { S(touchpad); }
-	virtual void parseMessage(xPL_MessageIn& msg) { sendParseMessage(msg); };
+	virtual void parseMessage(xPL_MessageIn& msg) { parseMessageChilds(msg); };
 
 	virtual void loop();
 

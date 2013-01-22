@@ -1,8 +1,4 @@
-// 
-// 
-// 
-
-#include "xPL_SensorUltrasonic.h"
+/*  ArduixPL - xPL for arduino  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.  This file is part of ArduixPL.    ArduixPL is free software: you can redistribute it and/or modify    it under the terms of the GNU General Public License as published by    the Free Software Foundation, either version 3 of the License, or    (at your option) any later version.    ArduixPL is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.    You should have received a copy of the GNU General Public License    along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.	  Modified 2013-1-22 by Mathieu GRENET 	  mailto:mathieu@mgth.fr	  http://www.mgth.fr*/#include "xPL_SensorUltrasonic.h"
 #include "pins_arduino.h"
 
 xPL_SensorUltrasonic::xPL_SensorUltrasonic(uint8_t pinTrig, uint8_t pinEcho, const VString & name){	_pinTrig=pinTrig;	_pinEcho=pinEcho;	setId(name);	setTemp(18.0);//	setBuffer(10);	//setThreshold(0.01);	setThreshold(0.01);	_timeB=micros();}size_t xPL_SensorUltrasonic::printCurrentTo(Print& p) const{	size_t len=0;	len += xPL_SensorGeneric::printCurrentTo(p);/*	len += xPL_Message::printKeyTo(p,F("A"),int(_timeA-_time));	len += xPL_Message::printKeyTo(p,F("B"),int(_timeB-_timeA));	len += xPL_Message::printKeyTo(p,F("C"),int(_timeC-_timeB));	len += xPL_Message::printKeyTo(p,F("D"),int(_timeD-_timeC));*/	return len;}void xPL_SensorUltrasonic::loop(){	if (micros()-_timeB<15000) return;	uint8_t bit = digitalPinToBitMask(_pinEcho);

@@ -42,6 +42,7 @@ float xPL_SensorDimmer::move(float v) {
 bool xPL_SensorDimmer::power(bool p)
 {
 	if (p!=_power) { _power=p; trig(); return !p; }
+	return p;
 }
 
 bool xPL_SensorDimmer::toggle()

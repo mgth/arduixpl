@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,16 +17,12 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
-/*
-
-
-*/
-
 #include "xPL_ENC28J60.h"
-//#include <EtherCard.h>
-#include "utility/xPL_Debug.h"
+#include "../xPL/utility/xPL_Debug.h"
 
 xPL_ENC28J60 xplAdapter;
 
@@ -509,19 +505,18 @@ size_t printWord(Print& p, word w) {
 	return len;
 }
 
-size_t printETH(Print& p)
+size_t xPL_ENC28J60::printETH(Print& p)
 {
 	size_t len = 0;
-	xPL_Eeprom epr(0); // to read mac address
 
 	for (byte i=0;i<6;i++) len += p.print('\xFF');       // broadcast mac
-	for (byte i=0;i<6;i++) len += p.print((char)epr.read()); // our mac address
+	len +=_mac.printBinTo(p);
 	len += printWord(p,0x800);
 
 	return len;
 }
 
-size_t printIP(Print& p, word totallen, word chksum=0)
+size_t xPL_ENC28J60::printIP(Print& p, word totallen, word chksum)
 {
 
 	size_t len=0;
@@ -546,7 +541,7 @@ size_t printIP(Print& p, word totallen, word chksum=0)
 }
 
 
-size_t printUDP(Print& p, xPL_Message& data, word len_udp, word chksum=0)
+size_t xPL_ENC28J60::printUDP(Print& p, xPL_Message& data, word len_udp, word chksum)
 {
 
 	size_t len =0;
@@ -655,80 +650,73 @@ public:
 		DBG(F("send"),_len);
 	}
 };
-size_t xPL_ENC28J60::event(const xPL_Event& evt) {
 
-	switch (evt.id()) 
+void xPL_ENC28J60::loop()
+{
+	if (!connection()) { return; }
+
+	size_t addr = gNextPacketPtr; 
+
+	word receiveLen = packetReceive();
+	if (!receiveLen) { return; }
+
+
+	drop(23); 
+
+	if ( readByte() == 0x11 ) // it is an UDP packet
 	{
-		default:
-			return xPL_AdapterEthernet::event(evt);
-		case LOOP:
-		{
-			if (!connection()) { return 0; }
-
-			size_t addr = gNextPacketPtr; 
-
-			word receiveLen = packetReceive();
-			if (!receiveLen) { return 0; }
-
-
-			drop(23); 
-
-			if ( readByte() == 0x11 ) // it is an UDP packet
-			{
-				drop(12);addr+=13;
+		drop(12);addr+=13;
 		
-				word udp_port=readWordLE();
+		word udp_port=readWordLE();
 
-				if (udp_port == XPL_PORT)
-				{
-					DBG(F("<ENC28J60 xPL>"),receiveLen);
-
-					VString msg(addr + 35,receiveLen-42,VSHelperENC28J60::helper);
-
-					xPL.event(xPL_Event(PARSE_MESSAGE,&msg));
-				}
-			}
-			packetRelease();
-			break;
-		}
-		case SEND_MESSAGE:
+		if (udp_port == XPL_PORT)
 		{
-			xPL_Message& msg = evt.message();
+			DBG(F("<ENC28J60 xPL>"),receiveLen);
 
-			size_t datalen = msg.len();
-
-			DBG(F("<send_ENC28J60> "),datalen);
-
-			if (connection()) 
-			{
-				checksum chk_ip;
-				checksum chk_udp;
-				encFiller filler;
-
-				printIP(chk_ip,20 + 8 + datalen);
-			//DBG(F("chk_ip "),chk_ip.len());
-
-
-			for (byte i=0;i<4;i++) chk_udp.print('\0');
-			for (byte i=0; i<4; i++) chk_udp.print('\xFF');
-				printUDP(chk_udp, msg, 8 + datalen);
-
-			//DBG(F("chk_udp "),chk_udp.len());
-
-				filler.start(14 + 20 + 8 + datalen);
-
-				printETH(filler);
-				printIP(filler,20 + 8 + datalen,chk_ip.sum());
-				printUDP(filler, msg, 8 + datalen ,chk_udp.sum_udp());
-
-				filler.send();
-
-				return datalen;
-			}
-			return 0;
+			VString s(addr + 35,receiveLen-42,VSHelperENC28J60::helper);
+			xPL_MessageIn msg(s);
+			xPL.parseMessage(msg);
 		}
 	}
+	packetRelease();
 }
+
+
+bool xPL_ENC28J60::sendMessage(xPL_Message& msg)
+{
+		size_t datalen = msg.len();
+
+		DBG(F("<send_ENC28J60> "),datalen);
+
+		if (connection()) 
+		{
+			checksum chk_ip;
+			checksum chk_udp;
+			encFiller filler;
+
+			printIP(chk_ip,20 + 8 + datalen);
+		//DBG(F("chk_ip "),chk_ip.len());
+
+
+		for (byte i=0;i<4;i++) chk_udp.print('\0');
+		for (byte i=0; i<4; i++) chk_udp.print('\xFF');
+			printUDP(chk_udp, msg, 8 + datalen);
+
+		//DBG(F("chk_udp "),chk_udp.len());
+
+			filler.start(14 + 20 + 8 + datalen);
+
+			printETH(filler);
+			printIP(filler,20 + 8 + datalen,chk_ip.sum());
+			printUDP(filler, msg, 8 + datalen ,chk_udp.sum_udp());
+
+			filler.send();
+
+			return true;
+		}
+		return false;
+}
+
 
 word xPL_ENC28J60::packetReceive() {
     word len = 0;

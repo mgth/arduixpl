@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,23 +17,27 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
 
-#ifndef XPLSCHEMA_H
-#define XPLSCHEMA_H
+#ifndef xPL_Schema_h
+#define xPL_Schema_h
 
-#include <xPL.h>
+#include "xPL_Node.h"
 
 class xPL_Schema : public xPL_NodeParent
 {
 protected:
 //	virtual size_t event(xPL_Event& evt);
-	virtual bool targeted(xPL_MessageIn& msg) const;
+	virtual bool targeted(xPL_MessageIn& msg);
 	
 public:
 
 	virtual void reg();
 	virtual xPL_Schema* schema();
+
+	virtual bool sendMessage(xPL_Message& msg) { return false; }
 };
 #endif

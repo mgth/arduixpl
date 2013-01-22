@@ -26,10 +26,10 @@
 
 #include <xPL.h>
 
-#include <SPI.h>
-#include <Ethernet.h>
-#include <Dhcp.h>
-#include <EthernetUdp.h>
+#include "utility/SPI.h"
+#include "utility/Ethernet.h"
+#include "utility/Dhcp.h"
+#include "utility/EthernetUdp.h"
 
 
 #include "utility/xPL_BufferFiller.h"

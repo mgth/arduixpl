@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,9 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
-
 #ifndef XPL_NODE_H
 #define XPL_NODE_H
 
@@ -55,7 +56,7 @@ public:
 };
 
 
-class xPL_Node/* : public Printable*/ {
+class xPL_Node {
 protected: 
 	xPL_NodeParent* _parent;
 	xPL_Node* _next;
@@ -66,7 +67,7 @@ protected:
 #endif
 
 
-	virtual bool targeted(xPL_MessageIn& msg) const { return false; }
+	virtual bool targeted(xPL_MessageIn& msg) { return false; }
 
 
 public:
@@ -115,17 +116,26 @@ public:
 	int count() const;
 
 
-	virtual xPL_Node* readConfig(xPL_Eeprom& eeprom);
+	void loopChilds();
+	virtual void loop(){ loopChilds(); }
 
-	size_t sendEvent(const xPL_Event& evt);
-	virtual size_t event(const xPL_Event& evt){ return sendEvent(evt); }
+	void parseMessageChilds(xPL_MessageIn& msg);
+	void configureChilds(xPL_Key& key);
+	void configChilds(xPL_Eeprom& eeprom, bool store=false);
+	size_t printConfigChilds(Print& p,bool list=false);
+	virtual void parseMessage(xPL_MessageIn& msg){ parseMessageChilds(msg); }
 
-	void msgAddKey(const VString& key,const VString& value, bool alloc=false) const ;
-
-//Printable
-/*	virtual size_t printTo(Print& p) const {
-			return 0;
-	}*/
+#ifdef XPL_CONFIG
+	virtual void configure(xPL_Key& key){ return configureChilds(key); }
+	virtual void config(xPL_Eeprom& eeprom, bool store=false){ configChilds(eeprom,store); }
+	virtual size_t printConfig(Print& p,bool list=false){ return printConfigChilds(p,list); }
+#endif
+	void configChilds();
+	virtual void defaultConfig() { configChilds(); }
+#ifdef XPL_INTERRUPTS
+	void interruptChilds(uint8_t pin, unsigned long time);
+	virtual void interrupt(uint8_t pin, unsigned long time){ interruptChilds(pin,time); }
+#endif
 
 };
 

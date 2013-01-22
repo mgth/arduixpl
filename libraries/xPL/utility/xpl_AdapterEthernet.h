@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,9 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
-
 
 #ifndef XPL_ADAPTERETHERNET_H
 #define XPL_ADAPTERETHERNET_H
@@ -49,6 +50,7 @@ private:
 public:
 	uint8_t bin[6];
 	virtual size_t printTo(Print& p) const;
+	size_t printBinTo(Print &p) const;
 	void fromString(VString &s);
 	void fromEeprom(xPL_Eeprom& eeprom);
 	void toEeprom(xPL_Eeprom& eeprom);
@@ -59,14 +61,22 @@ public:
 class xPL_AdapterEthernet : public xPL_Schema
 {
 protected:
+#ifdef XPL_CONFIG
+	size_t printConfig(Print& p, bool list=false);
+	void configure(xPL_Key& key);
+	void config(xPL_Eeprom& eeprom,bool store=false);
+#endif
+	void defaultConfig();
 
 	xPL_MacAddress _mac;
+
+#ifdef XPL_IP
 	xPL_IpAddress _ip;
 	xPL_IpAddress _mask;
 	bool _dhcp;
+#endif
 
-
-	size_t event(const xPL_Event& evt);
+	size_t eventConfig(const xPL_Event& evt);
 
 public:
 	virtual bool connection() =0;

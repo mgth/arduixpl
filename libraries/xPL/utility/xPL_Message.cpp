@@ -17,11 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Jan 18, 2013 by Mathieu GRENET 
+	  Modified 2013-1-22 by Mathieu GRENET 
 	  mailto:mathieu@mgth.fr
 	  http://www.mgth.fr
 */
-
 #include "xPL_Message.h"
 #include "vstring.h"
 #include "xPL_Adapter.h"
@@ -187,8 +186,8 @@ xPL_ChildsPrinter content(*this);
 size_t xPL_Message::printContentTo(Print& p) const {	return 0;	//	return xPL_ChildsPrinter(*this).printTo(p);}
 
 
-bool xPL_Message::send(){
-	return xPL.event(xPL_Event(SEND_MESSAGE,this));
+size_t xPL_Message::send(){
+	return xPL.sendMessage(*this);
 }
 
 /********************************************************************

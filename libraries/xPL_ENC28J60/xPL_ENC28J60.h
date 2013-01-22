@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,18 +17,13 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified Jan 20, 2013 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
-// Many parts derived from:
-//      EHTERSHIELD_H library for Arduino etherShield
-//      Copyright (c) 2008 Xing Yu.  All right reserved. (this is LGPL v2.1)
-// enc28j60 and ip code (which is GPL v2)
-//      Author: Pascal Stang 
-//      Modified by: Guido Socher
-//      DHCP code: Andrew Lindsay
 
-#ifndef XPL_ENC28J60_H
-#define XPL_ENC28J60_H
+#ifndef xPL_ENC28J60_h
+#define xPL_ENC28J60_h
 
 
 #include <xPL.h>
@@ -37,17 +32,18 @@
 class xPL_ENC28J60 : public xPL_AdapterEthernet
 {
 private:
+	size_t printETH(Print& p);
+	size_t printIP(Print& p, word totallen, word chksum=0);
+	size_t printUDP(Print& p, xPL_Message& data, word len_udp, word chksum=0);
+
 protected:
 public:
 	virtual bool begin();
 	
 	virtual bool connection();
 
-	size_t event(const xPL_Event& evt);
-
-#ifdef XPL_HTML_SUPPORT
-	virtual bool sendHomePage(); 
-#endif
+	void loop();
+	bool sendMessage(xPL_Message& msg);
 
 
 	byte initialize ();
@@ -62,17 +58,10 @@ public:
 
 class VSHelperENC28J60 : public VStringHelper
 {
-private:
-//	uint8_t* _ptr;
 protected:
-//	size_t write(uint8_t c);
-
-//	VString from(VString& s);
 	char charAt(size_t pos, const VString& s) const;
 
 public:
-//	VSHelperEeprom():_ptr(NULL) {};
-//	bool setPos(size_t pos) { _ptr = (uint8_t*)pos; return true; }
 	
 	static VSHelperENC28J60 helper;
 };

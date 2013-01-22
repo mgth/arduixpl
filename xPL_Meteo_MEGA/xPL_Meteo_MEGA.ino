@@ -1,41 +1,46 @@
+/*
+  ArduixPL - xPL for arduino
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
-#include <SPI.h>
-#include <Ethernet.h>
-#include <Dhcp.h>
-#include <EthernetUdp.h>
-#include <Wire.h> 
-#include <LiquidCrystal_I2C.h>
+  This file is part of ArduixPL.
 
+    ArduixPL is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    ArduixPL is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
+
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
+*/
 
 #include <xPL.h>
-//#include <xPL_Config.h>
-#include "utility/xPL_Hbeat.h"
 
 #include <xPL_AdapterW5100.h>
+//#include <xPL_ENC28J60.h>
 #include <xPL_Sensor.h>
 #include <xPL_SensorDallas.h>
 #include <xPL_SensorDHT.h>
 
 #include <Wire.h>
 #include <xPL_SensorBMP085.h>
-#include <xPL_SensorUltrasonic.h>
 
 #include <Arduino.h>
 
-xPL_Hbeat xplHbeat;
-
-unsigned long lasttime;
-
-void setup()
+XPL_SETUP()
 {
-	Serial.begin(57600);
-  DBG(F("=== boot ===="),);
-  DBG_MEM(F("start"));
+	DBG(F("=== boot ===="),);
+	DBG_MEM(F("start"));
 
-  xplAdapter.reg();
-//	xplConfig.reg();
-	xplHbeat.reg();
-
+	xplAdapter.reg();
 	xplSensor.reg();
 
 	xPL.begin(F("arduixpl"),F("sensors"),F("meteo"));
@@ -45,20 +50,13 @@ void setup()
 	xplSensor.addChild(new xPL_SensorDHT(6, 11, F("dht11t"), F("dht11h")));
 	xplSensor.addChild(new xPL_SensorBMP085(F("bmp085t"), F("bmp085p")));
 
-	xplSensor.addChild(new xPL_SensorUltrasonic(5,2,S(distance)));
-
-	lasttime=millis();
 }
 
-void loop()
+XPL_LOOP()
 {
-
 	xPL.loop();
-	
-//	DBG(F("time"),millis()-lasttime);
-//	lasttime=millis();
 	DBG_MEM(F("loop"));
-
 }
+XPL_END
 
 

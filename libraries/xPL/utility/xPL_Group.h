@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,12 +17,14 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Apr 21, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
-#ifndef xPL_Group_H
-#define xPL_Group_H
 
-#include <xPL.h>
+#ifndef xPL_Group_h
+#define xPL_Group_h
+
 #include "utility/xPL_Schema.h"
 
 #ifndef XPL_MAX_GROUPS
@@ -33,10 +35,13 @@ class xPL_Group:public xPL_Node {
 private:
 	VString _group;
 protected:
-	virtual size_t event(const xPL_Event& evt);
+	void config(xPL_Eeprom& eeprom,bool store=false);
+	size_t printConfig(Print& p, bool list=false);
+
 	size_t printTo(Print& p) const;
 public:
 	xPL_Group(const VString& s);
+	bool checkTarget(xPL_MessageIn& msg);
 };
 
 class xPL_SchemaGroup:public xPL_Schema {
@@ -46,13 +51,14 @@ private:
 protected:
 	virtual const __FlashStringHelper* className() const { return S(group); }
 
-	virtual xPL_Node* add(const VString& id) { return addChild(new xPL_Group(id)); }
+	xPL_Node* add(const VString& id);
 
-	virtual size_t event(const xPL_Event& evt);
-
+	void loop();
+	size_t printConfig(Print& p, bool list=false);
+	void configure(xPL_Key& key);
+	void config(xPL_Eeprom& eeprom, bool store=false);
+public:
+	bool checkTarget(xPL_MessageIn& msg);
 };
-
-extern xPL_SchemaGroup xplGroup;
-
 
 #endif

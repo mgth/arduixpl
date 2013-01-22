@@ -1,6 +1,6 @@
 /*
   ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,7 +17,9 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-1-22 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
 
 #include "xPL_Node.h"
@@ -121,34 +123,15 @@ void xPL_NodeParent::deleteChilds()
 	}
 	_child=NULL;
 }
-/*
-void xPL_Node::sendEvent (const xPL_Event& evt, bool childsOnly, bool all)
-{
-	if (all && _next) { _next->sendEvent(evt,childsOnly,all);}
-	if (childsOnly || evt.send(*this))
-	{ 
-		if (child()) child()->sendEvent(evt,false,true);
-//		evt.close(*this);
-	}
-}
-*/
 
-size_t xPL_Node::sendEvent(const xPL_Event& evt)
-{
-	size_t len =0;
-	xPL_Node* n = child();
-	while(n) { len += n->event(evt); n=n->next(); }
-	return len;
-}
 
-/*
-void xPL_Node::sendLoop()
+void xPL_Node::loopChilds()
 {
 	xPL_Node* n = child();
 	while(n) { n->loop(); n=n->next(); }
 }
 
-void xPL_Node::sendParseMessage (xPL_MessageIn& msg)
+void xPL_Node::parseMessageChilds(xPL_MessageIn& msg)
 {
 	xPL_Node* n = child();
 	while(n) {
@@ -159,70 +142,44 @@ void xPL_Node::sendParseMessage (xPL_MessageIn& msg)
 	}
 }
 
-void xPL_Node::sendCheckTargeted (xPL_MessageIn& msg)
-{
-	xPL_Node* n = child();
-	while(n) { n->parseMessage(msg); n=n->next(); }
-}
 
-void xPL_Node::sendConfigure (xPL_Key& key)
+
+void xPL_Node::configureChilds (xPL_Key& key)
 {
+#ifdef XPL_CONFIG
 	xPL_Node* n = child();
 	while(n) { n->configure(key); n=n->next(); }
+#endif
 }
 
-void xPL_Node::sendStoreConfig (xPL_Eeprom& eeprom)
+void xPL_Node::configChilds(xPL_Eeprom& eeprom, bool store)
+{
+#ifdef XPL_CONFIG
+	xPL_Node* n = child();
+	while(n) { n->config(eeprom,store); n=n->next(); }
+#endif
+}
+
+size_t xPL_Node::printConfigChilds (Print& p,bool list)
+{
+	size_t len=0;
+#ifdef XPL_CONFIG
+	xPL_Node* n = child();
+	while(n) { len+=n->printConfig(p,list); n=n->next(); }
+#endif
+	return len;
+}
+
+void xPL_Node::configChilds()
 {
 	xPL_Node* n = child();
-	while(n) { n->storeConfig(eeprom); n=n->next(); }
+	while(n) { n->defaultConfig(); n=n->next(); }
 }
-
-void xPL_Node::sendLoadConfig (xPL_Eeprom& eeprom)
-{
-	xPL_Node* n = child();
-	while(n) { n->loadConfig(eeprom); n=n->next(); }
-}
-
-void xPL_Node::sendInterrupt (uint8_t pin, unsigned long time)
+#ifdef XPL_INTERRUPTS
+void xPL_Node::interruptChilds(uint8_t pin, unsigned long time)
 {
 	xPL_Node* n = this->child();
 	while(n) { n->interrupt(pin,time); n=n->next(); }
 }
+#endif
 
-size_t xPL_Node::sendPrintConfigListTo (Print& p)
-{
-	size_t len=0;
-	xPL_Node* n = child();
-	while(n) { len+=n->printConfigListTo(p); n=n->next(); }
-	return len;
-}
-
-size_t xPL_Node::sendPrintConfigCurrentTo (Print& p)
-{
-	size_t len=0;
-	xPL_Node* n = child();
-	while(n) { len+=n->printConfigCurrentTo(p); n=n->next(); }
-	return len;
-}
-*/
-/********************************************************************
-CONFIG
-********************************************************************/
-
-xPL_Node* xPL_Node::readConfig(xPL_Eeprom& eeprom)
-{
-	VString id=eeprom.readString();
-	if (id) return findOrAdd(id);
-	return NULL;
-}
-/*
-void xPL_Node::loadConfig(xPL_Eeprom& eeprom)
-{
-	while ( xPL_Node* node = readConfig(eeprom))
-	{
-		node->loadConfig(eeprom);
-	}
-}
-
-void xPL_Node::storeConfig(xPL_Eeprom& eeprom) { sendStoreConfig(eeprom); eeprom.write('\0'); }
-*/
