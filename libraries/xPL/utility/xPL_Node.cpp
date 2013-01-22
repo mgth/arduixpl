@@ -50,7 +50,7 @@ xPL_Schema* xPL_Node::schema() { return (_parent)?_parent->schema():NULL; }
 
 xPL_Node* xPL_Node::findOrAdd(const VString& cmpid)
 {
-	xPL_Node* n = findChild(cmpid);
+	xPL_Node* n = find(cmpid);
 	if (!n) n = add(cmpid);
 	return n;
 }
@@ -75,22 +75,25 @@ xPL_Node* xPL_NodeParent::addChild( xPL_Node* node)
 		_child = node;
 	}
 	return node;
+/*	if (node)
+	{ 
+		xPL_Node* n = child();
+		if (!n) { _child=node; }
+		while (n->next()) n=n->next();
+		node->_parent = this;
+		n->_next = node;
+	}
+	return node;
+*/	
 }
 
-xPL_Node* xPL_Node::find(const VString& id) {
-
-	if ( is(id) ) return this;
-
-	if (_next) return _next->find(id);
-
-	return NULL;
-}
-
-xPL_Node* xPL_Node::findChild(const VString& cmpid)
+xPL_Node* xPL_Node::find(const VString& cmpid)
 {
-	if (child())
+	xPL_Node* n = child();
+	while (n)
 	{
-		return child()->find(cmpid);
+		if (n->is(cmpid)) return n;
+		n=n->next();
 	}
 	return NULL;
 }

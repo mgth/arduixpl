@@ -73,6 +73,10 @@ public:
 	void begin(const __FlashStringHelper* vendor, const __FlashStringHelper* device, const __FlashStringHelper* instance=NULL);
 
 	bool sendMessage(xPL_Message &msg);
+	void parseMessage(xPL_MessageIn& msg)
+	{
+		if (targeted(msg)) parseMessageChilds(msg);
+	}
 
 	bool setId(const VString& id);
 	xPL_Address& source();

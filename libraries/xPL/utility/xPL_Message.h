@@ -32,6 +32,7 @@ public:
 //	virtual const __FlashStringHelper* className() const { return S(message); }	
 	VString id;
 	VString value;
+	virtual bool is(const VString& cmpid) { return cmpid==id; }
 
 	void parse(VString& buffer);
 

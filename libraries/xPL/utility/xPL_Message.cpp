@@ -213,7 +213,7 @@ xPL_Key* xPL_MessageIn::getKey(const __FlashStringHelper* name)
 {
 	if (parseContent())
 	{
-		return (xPL_Key*)_keys.findChild(name);
+		return (xPL_Key*)_keys.find(name);
 	}
 	return NULL;
 }

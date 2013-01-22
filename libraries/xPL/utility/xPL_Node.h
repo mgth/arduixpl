@@ -109,7 +109,6 @@ public:
 
 	virtual bool is(const VString& id) { return false; }
 	xPL_Node* find(const VString& id);
-	xPL_Node* findChild(const VString& id);
 
 	xPL_Node* defaultNode() const;
 
