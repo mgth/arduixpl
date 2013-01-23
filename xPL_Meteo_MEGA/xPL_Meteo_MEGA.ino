@@ -47,7 +47,7 @@ XPL_SETUP()
 
 	xPL_SensorDallasTemp::discoverOneWireTemp(xplSensor,S(temp));
 
-	xplSensor.addChild(new xPL_SensorDHT(6, 11, F("dht11t"), F("dht11h")));
+	xplSensor.addChild(new xPL_SensorDHT(6, 22, F("dht22t"), F("dht22h")));
 	xplSensor.addChild(new xPL_SensorBMP085(F("bmp085t"), F("bmp085p")));
 
 }
