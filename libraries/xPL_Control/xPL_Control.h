@@ -32,14 +32,14 @@ class xPL_Control : public xPL_Device {	virtual const __FlashStringHelper* clas
 };
 
 class xPL_ControlOutput : public xPL_Control {
-	virtual size_t event(const xPL_Event& evt);
+	void parseMessage(xPL_MessageIn& msg);
 	virtual void setValue(bool v) = 0;
 	virtual bool getValue() = 0;
 public:
 	xPL_ControlOutput(const VString& name):xPL_Control(name) {  }};
 
 class xPL_ControlVariable : public xPL_Control {
-	virtual size_t event(const xPL_Event& evt);
+	void parseMessage(xPL_MessageIn& msg);
 	virtual void setValue(float v) = 0;
 	virtual float getValue() = 0;
 public:	xPL_ControlVariable(const VString& name):xPL_Control(name) {  }};
@@ -47,13 +47,9 @@ public:	xPL_ControlVariable(const VString& name):xPL_Control(name) {  }};
 class xPL_ControlPin : public xPL_ControlOutput {
 	byte _pin;
 	bool _v;
-public:	xPL_ControlPin(const VString& name, byte pin):xPL_ControlOutput(name),_pin(pin) {  }	virtual void setValue(bool v)
-	{
-		_v = v;
-		pinMode(_pin,OUTPUT);
-		digitalWrite(_pin,v);
-	}
-	virtual bool getValue() {return _v; };
+public:	xPL_ControlPin(const VString& name, byte pin):xPL_ControlOutput(name),_pin(pin) {  }	
+	void setValue(bool v);
+	bool getValue() {return _v; };
 };
 
 class xPL_ControlPWM : public xPL_ControlVariable {

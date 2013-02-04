@@ -26,7 +26,7 @@
 
 bool xPL_Device::targeted(xPL_MessageIn& msg)
 {
-	if (msg.key_device() != id) return false;
+	if ( !is(msg.key_device()) ) return false;
 
 	VString s = msg.key_type();
 	if (!s) return true;
