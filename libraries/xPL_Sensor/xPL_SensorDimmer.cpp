@@ -1,6 +1,6 @@
-/*
-  ArduixPL - xPL for arduino
-  Copyright (c) 2012 Mathieu GRENET.  All right reserved.
+/*
+  ArduixPL - xPL library for Arduino(tm)
+  Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
 
@@ -17,8 +17,11 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Dec 23, 2012 by Mathieu GRENET
+	  Modified 2013-2-4 by Mathieu GRENET 
+	  mailto:mathieu@mgth.fr
+	  http://www.mgth.fr
 */
+
 #include "xPL_Sensor.h"
 size_t xPL_SensorDimmer::printCurrentTo(Print& p) const{	size_t l=0;	l += xPL_Message::printKeyTo(p,S(current),_tmpValue);	l += xPL_Message::printKeyTo(p,S(power),(_power)?S(on):S(off));	l += xPL_Message::printKeyTo(p,S(units),F("%"));	return l;}float xPL_SensorDimmer::setValue(float v) {	setTmpValue(v);
 	_value=_tmpValue;
