@@ -33,4 +33,4 @@ XPL_LOOP()
 	xPL.loop();
 }
 
-//XPL_END
+XPL_END

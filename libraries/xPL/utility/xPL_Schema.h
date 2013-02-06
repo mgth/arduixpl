@@ -40,4 +40,18 @@ public:
 
 	virtual bool sendMessage(xPL_Message& msg) { return false; }
 };
+
+class xPL_SchemaGeneric : public xPL_Schema
+{
+	const __FlashStringHelper* _schClass;
+	void (*_parser)(xPL_MessageIn& msg);
+
+	const __FlashStringHelper* className() const { return _schClass; }
+
+	void parseMessage(xPL_MessageIn& msg){ (*_parser)(msg); }
+public:
+	xPL_SchemaGeneric(const __FlashStringHelper* schClass, void (&parser)(xPL_MessageIn& msg)):
+		_schClass(schClass), _parser(&parser) {}
+
+};
 #endif

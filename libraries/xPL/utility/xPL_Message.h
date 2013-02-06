@@ -68,6 +68,41 @@ class xPL_Message
 	virtual size_t printTargetTo(Print& p) const { return p.print('*'); }
 	virtual const __FlashStringHelper* msgType() const { return S(stat); }	virtual const __FlashStringHelper* schClass() const;	virtual const __FlashStringHelper* schType() const { return S(basic); }};
 
+class xPL_MessageGeneric : public xPL_Message
+{
+	const __FlashStringHelper* _msgType;
+	const __FlashStringHelper* _schClass;
+	const __FlashStringHelper* _schType;
+
+	xPL_Address _target;
+
+	xPL_Node _keys;
+
+public:
+	xPL_MessageGeneric(const __FlashStringHelper* msgType,const  __FlashStringHelper* schClass,const __FlashStringHelper* schType, const xPL_Address& target=xPL_Address()):
+		_msgType(msgType),_schClass(schClass),_schType(schType),_target(target)
+	{
+	}
+
+
+	xPL_Key* addKey(const VString& key,const VString& value) { return (xPL_Key*)_keys.addChild(new xPL_Key(key,value)); }
+
+protected:
+	virtual const __FlashStringHelper* msgType() const { return _msgType; }	virtual const __FlashStringHelper* schClass() const { return _schClass; }	virtual const __FlashStringHelper* schType() const { return _schType; }
+	virtual size_t printContentTo(Print& p) const
+	{
+		size_t len;
+		xPL_Node* n = const_cast<xPL_Node*>(&_keys)->child();
+		while (n)
+		{
+			len += ((xPL_Key*)n)->printTo(p);
+			len += p.print('\n');
+			n=n->next();
+		}
+		return len;
+	}
+	virtual size_t printTargetTo(Print& p) const { return _target.printTo(p); }
+};
 
 class xPL_MessageIn {
 private:
