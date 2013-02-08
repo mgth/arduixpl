@@ -25,14 +25,14 @@
 #ifndef XPL_NUMERIC_H
 #define XPL_NUMERIC_H
 
-#include <xPL.h>
+//#include <xPL.h>
 #include "xPL_Eeprom.h"
 
-class xPL_Numeric: public xPL_Printable
+class xPL_Numeric: public Printable
 {
 protected:
-	virtual void store(uint16_t val,uint8_t dec=0)=0;
-	virtual uint16_t load(uint8_t dec=0) const =0;
+	virtual void store(long val,uint8_t dec=0)=0;
+	virtual long load(uint8_t dec=0) const =0;
 
 	virtual uint8_t dec() const { return 2; }
 
@@ -71,15 +71,22 @@ virtual void fromString(const VString& s)
 
 	}
 
-	static unsigned long divider(int8_t dec) {
+	static long divider(int8_t dec) {
 		long div=1;
 		while (dec>0) {div*=10; dec--; }
 		return div;
 	}
 
-	static size_t printLong(unsigned long num,int8_t dec,Print& p, bool trailingZeros=false)
+	// TODO : try to make it non recursive
+	static size_t printLong(long num,int8_t dec,Print& p, bool trailingZeros=false)
 	{
 		size_t len=0;
+
+		if (num<0)
+		{
+			num = -num;
+			len += p.print('-');
+		}
 
 		while(!trailingZeros && !(num%10) && dec) { num/=10; dec--; }
 
@@ -109,8 +116,8 @@ class xPL_Int:public xPL_Numeric
 {
 	int _val;
 protected:
-	virtual void store(uint16_t val,uint8_t dec=0) { _val = (int)val; }
-	virtual uint16_t load(uint8_t dec=0) const {return _val*divider(dec);}
+	virtual void store(long val,uint8_t dec=0) { _val = (int)val; }
+	virtual long load(uint8_t dec=0) const {return _val*divider(dec);}
 	virtual byte dec() const { return 0; }
 
 	size_t printTo(Print& p) const
@@ -129,18 +136,19 @@ public:
 class xPL_Float:public xPL_Numeric
 {
 	float _val;
+	uint8_t _dec;
 protected:
-	virtual void store(uint16_t val,uint8_t dec=0) { _val = (float)val/divider(dec); }
-	virtual uint16_t load(uint8_t dec=0) const {return _val*divider(dec);}
+	virtual void store(long val,uint8_t dec=0) { _val = (float)val/divider(dec); }
+	virtual long load(uint8_t dec=0) const {return _val*divider(dec);}
 	virtual byte dec() const { return 0; }
 
 	size_t printTo(Print& p) const {
-		return p.print(_val,2);
+		return p.print(_val,_dec);
 	}
 public:
-	xPL_Float() { _val=0.0; }
-	xPL_Float(const VString& s) { fromString(s); }
-	xPL_Float(float f) { _val=f; }
+	xPL_Float():_val(0.0) {}
+	xPL_Float(const VString& s, uint8_t dec=2) { fromString(s); _dec=dec; }
+	xPL_Float(float f, uint8_t dec=2):_val(f),_dec(dec) {}
 
 	operator float() { return _val; }
 	float toFloat() { return _val; }
