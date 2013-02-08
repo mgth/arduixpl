@@ -31,7 +31,6 @@
 #include "xPL_String.h"
 #include "xPL_BufferFiller.h"
 #include "xPL_Eeprom.h"
-#include "xPL_Event.h"
 
 class xPL_Main;
 class xPL_Key;
