@@ -42,7 +42,7 @@ DEBUG OPTIONS
 // To print debug info
 #define XPL_DEBUG
 // to print memory related debug info
-//#define XPL_DEBUG_MEM
+#define XPL_DEBUG_MEM
 
 // to print debug info on LCD
 //(you should include Wire.h & LiquidCrystal_I2C.h)

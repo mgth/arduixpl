@@ -35,6 +35,7 @@ VSHelperRamAlloc VSHelperRamAlloc::helper;
 VSHelperFlash VSHelperFlash::helper;
 VSHelperEeprom VSHelperEeprom::helper;
 VSHelperPrintable VSHelperPrintable::helper;
+VSHelperPrintableAlloc VSHelperPrintableAlloc::helper;
 
 
 VString VStringHelper::from(VString& s) {return s;}
@@ -146,6 +147,13 @@ size_t VSHelperPrintable::rawlen(const VString& s) const {
 size_t VSHelperPrintable::len(const VString& s) const {
 	return rawlen(s);
 }
+
+void VSHelperPrintableAlloc::destruct(VString& s) const {
+	free((void*)s.addr());
+	s.setAddr((char*)NULL);
+}
+
+
 /********************************************************************
 VString
 ********************************************************************/

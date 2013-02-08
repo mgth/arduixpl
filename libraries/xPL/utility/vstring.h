@@ -126,6 +126,14 @@ public:
 	static VSHelperPrintable helper;
 };
 
+class VSHelperPrintableAlloc : public VSHelperPrintable
+{
+protected:
+	void destruct(VString& s) const;
+public:
+	static VSHelperPrintableAlloc helper;
+};
+
 class VString
 {
  protected:

@@ -2,6 +2,7 @@
 #define XPL_MESSAGE_H
 
 #include "xPL_Node.h"
+#include "xPL_Numeric.h"
 
 class xPL_Key: public xPL_Node {
 protected:
@@ -17,6 +18,26 @@ public:
 	xPL_Key(xPL_Key* key);
 	xPL_Key() {};
 	xPL_Key(const VString& key,const VString&  val):id(key),value(val) {}
+
+	xPL_Key(const VString& key,int val):id(key)
+	{
+		xPL_Int* i= new xPL_Int(val);
+		if (i)
+		{
+			value=i;
+			value.setHelper(VSHelperPrintableAlloc::helper);
+		}
+	}
+
+	xPL_Key(const VString& key,float val,int dec=2):id(key)
+	{
+		xPL_Float* f= new xPL_Float(val,dec);
+		if (f)
+		{
+			value=f;
+			value.setHelper(VSHelperPrintableAlloc::helper);
+		}
+	}
 
 	size_t printTo(Print& p) const;
 };
@@ -86,6 +107,8 @@ public:
 
 
 	xPL_Key* addKey(const VString& key,const VString& value) { return (xPL_Key*)_keys.addChild(new xPL_Key(key,value)); }
+	xPL_Key* addKey(const VString& key,int value) { return (xPL_Key*)_keys.addChild(new xPL_Key(key,value)); }
+	xPL_Key* addKey(const VString& key,float value, int dec=2) { return (xPL_Key*)_keys.addChild(new xPL_Key(key,value,dec)); }
 
 protected:
 	virtual const __FlashStringHelper* msgType() const { return _msgType; }	virtual const __FlashStringHelper* schClass() const { return _schClass; }	virtual const __FlashStringHelper* schType() const { return _schType; }

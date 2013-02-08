@@ -25,10 +25,6 @@ void setup()
 	
 	xPL.addChild(new xPL_SchemaGeneric(F("test"),parserTest));
 
-	msg = new xPL_MessageGeneric(S(stat),F("test"),S(basic));
-	msg->addKey(F("dummy"),F("nothing"));
-	msg->addKey(F("value"),&value);
-
 
 	xPL.begin(F("arduixpl"),F("test"),F("default"));
 	timer = millis();
@@ -39,12 +35,15 @@ void loop()
 	if (millis()-timer>1000)
 	{
 		// exemple d'envoi de message toutes les secondes.
-		value=((float)millis())/1000.0;
+		xPL_MessageGeneric msg(S(stat),F("test"),S(basic));
 
-		msg->send();
+		msg.addKey(F("value"),(float)millis()/1000.0,2);
+
+		msg.send();
 
 		timer=millis();
 	}
 
 	xPL.loop();
+	DBG_MEM(F("loop"));
 }
