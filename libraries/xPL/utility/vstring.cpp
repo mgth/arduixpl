@@ -39,7 +39,7 @@ VSHelperPrintable VSHelperPrintable::helper;
 
 VString VStringHelper::from(VString& s) {return s;}
 
-//size_t VStringHelper::len(const VString& s) const {return s._len;}
+size_t VStringHelper::len(const VString& s) const {return s.storedLen();}
 
 size_t VStringHelper::rawlen(const VString& s) const
 {
@@ -143,7 +143,9 @@ size_t VSHelperPrintable::rawlen(const VString& s) const {
 
 	return s.printTo(p);
 }
-
+size_t VSHelperPrintable::len(const VString& s) const {
+	return rawlen(s);
+}
 /********************************************************************
 VString
 ********************************************************************/
@@ -201,10 +203,10 @@ VString & VString::operator = (String &&rval)
 bool VString::operator==(const VString& s) const {	size_t i=0;	for (;;)	{		char c = charAt(i);		if (s.charAt(i)!=c) return false;		if (!c) return true;		i++;	}}bool VString::toBool() const {
 
 	if (
-		operator==(F("true")) ||  // 18
-	    operator==(F("1"))  ||  // 14
-		operator==(F("on"))     ||  // 16
-		operator==(F("yes"))  // 16
+		operator==(F("true")) ||  
+	    operator==(F("1"))  ||  
+		operator==(F("on"))     ||
+		operator==(F("yes"))
 	) return true;
 	
 	return false;

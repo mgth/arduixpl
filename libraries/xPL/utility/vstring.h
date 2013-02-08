@@ -45,6 +45,7 @@ protected:
 public:
 	virtual VString from(VString& s);
 	virtual char charAt(size_t pos, const VString& s) const=0;
+	virtual size_t len(const VString& s) const;
 	virtual size_t rawlen(const VString& s) const;
 	virtual size_t printTo(Print& p, const VString& s) const;
 	virtual void destruct(VString& s) const {};
@@ -113,6 +114,7 @@ public:
 	static VSHelperEeprom helper;
 };
 
+
 class VSHelperPrintable : public VStringHelper
 {
 protected:
@@ -120,6 +122,7 @@ public:
 	char charAt(size_t pos, const VString& s) const;
 	size_t printTo(Print& p, const VString& s) const;
 	size_t rawlen(const VString& s) const;
+	size_t len(const VString& s) const;
 	static VSHelperPrintable helper;
 };
 
@@ -152,7 +155,8 @@ class VString
 	
 	 size_t printlnTo(Print&p, char ln='\n') const { return printTo(p) + p.print(ln); }
 	 size_t printNzTo(Print& p) const { return (_len)?printTo(p):0; }	 size_t printlnNzTo(Print& p, char ln='\n') const { return (_len)?printlnTo(p,ln):0; }
-	 size_t len() const { return _len; /*return helper().len(*this);*/ }
+	 size_t storedLen() const { return _len; /*return helper().len(*this);*/ }
+	 size_t len() const { return helper().len(*this); }
 	 size_t rawLen() const { return helper().rawlen(*this); }
 
 	 char charAt(size_t pos) const {
