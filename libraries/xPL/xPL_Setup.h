@@ -57,7 +57,7 @@ ETHERNET OPTIONS
 *****************************************************************************/
 
 #define ENC28J60_PIN 10
-#define XPL_IP
+//#define XPL_IP
 #define XPL_DHCP 
 // xPL default port, do not change
 #define XPL_PORT 3865
