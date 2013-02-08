@@ -23,6 +23,7 @@
 */
 
 #include "xPL_Device.h"
+#include "xPL_Message.h"
 
 bool xPL_Device::targeted(xPL_MessageIn& msg)
 {
