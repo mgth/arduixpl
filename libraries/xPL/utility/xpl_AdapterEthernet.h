@@ -32,7 +32,7 @@
 #include "IPAddress.h"
 #include "xPL_Adapter.h"
 
-class xPL_IpAddress : public xPL_Printable
+class xPL_IpAddress : public Printable
 {
 private:
 public:
@@ -44,17 +44,17 @@ public:
 	int fromEeprom(xPL_Eeprom& eeprom);
 };
 
-class xPL_MacAddress : public xPL_Printable
+class xPL_MacAddress : public Printable
 {
 private:
 public:
-	uint8_t bin[6];
+	char bin[6];
 	virtual size_t printTo(Print& p) const;
 	size_t printBinTo(Print &p) const;
 	void fromString(VString &s);
 	void fromEeprom(xPL_Eeprom& eeprom);
 	void toEeprom(xPL_Eeprom& eeprom);
-	void toArray(uint8_t* mac);
+	void toArray(char* mac);
 	void setRandom();
 };
 
@@ -75,8 +75,6 @@ protected:
 	xPL_IpAddress _mask;
 	bool _dhcp;
 #endif
-
-	size_t eventConfig(const xPL_Event& evt);
 
 public:
 	virtual bool connection() =0;

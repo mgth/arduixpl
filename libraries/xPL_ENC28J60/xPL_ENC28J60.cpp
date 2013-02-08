@@ -529,12 +529,11 @@ size_t xPL_ENC28J60::printIP(Print& p, word totallen, word chksum)
 
 	len += printWord(p,chksum);
 
-/*	len += p.print((char)192);
-	len += p.print((char)168);
-	len += p.print((char)1);
-	len += p.print((char)192);
-*/
-	for (byte i=0;i<4;i++) len += p.print('\0');       // Ip source and dest set to all ones.
+#ifdef XPL_IP
+	for (byte i=0;i<4;i++) len += p.print(_ip.bin[i]);
+#else
+	for (byte i=0;i<4;i++) len += p.print('\0');
+#endif
 	for (byte i=0;i<4;i++) len += p.print('\xFF');       // Ip source and dest set to all ones.
 
 	return len;
@@ -697,9 +696,12 @@ bool xPL_ENC28J60::sendMessage(xPL_Message& msg)
 			printIP(chk_ip,20 + 8 + datalen);
 		//DBG(F("chk_ip "),chk_ip.len());
 
-
-		for (byte i=0;i<4;i++) chk_udp.print('\0');
-		for (byte i=0; i<4; i++) chk_udp.print('\xFF');
+#ifdef XPL_IP
+	for (byte i=0;i<4;i++) chk_udp.print(_ip.bin[i]);
+#else
+	for (byte i=0;i<4;i++) chk_udp.print('\0');
+#endif
+			for (byte i=0; i<4; i++) chk_udp.print('\xFF');
 			printUDP(chk_udp, msg, 8 + datalen);
 
 		//DBG(F("chk_udp "),chk_udp.len());
@@ -709,7 +711,6 @@ bool xPL_ENC28J60::sendMessage(xPL_Message& msg)
 			printETH(filler);
 			printIP(filler,20 + 8 + datalen,chk_ip.sum());
 			printUDP(filler, msg, 8 + datalen ,chk_udp.sum_udp());
-
 			filler.send();
 
 			return true;

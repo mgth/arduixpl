@@ -61,7 +61,7 @@ void xPL_IpAddress::fromString(VString &s)
 	byte i=0;
 	
 	int pos=0;
-	uint8_t val=0;
+	char val=0;
 
 	char c = '1'; // dummy value not to be false;
 
@@ -75,7 +75,7 @@ void xPL_IpAddress::fromString(VString &s)
 	}
 }
 
-char toHex(uint8_t b) { return (char)(b>9)?(b-10+'A'):(b+'0'); }
+char toHex(char b) { return (b>9)?(b-10+'A'):(b+'0'); }
 
 size_t xPL_MacAddress::printTo(Print& p) const
 {
@@ -91,9 +91,8 @@ size_t xPL_MacAddress::printTo(Print& p) const
 
 size_t xPL_MacAddress::printBinTo(Print& p) const
 {
-	int len = 0;
-	for (byte i=0;i<6;i++) len += p.print(bin[i]);
-	return len;
+	for (byte i=0;i<6;i++) p.print(bin[i]);
+	return 6;
 }
 
 void xPL_MacAddress::fromString(VString &s)
@@ -126,7 +125,7 @@ void xPL_MacAddress::toEeprom(xPL_Eeprom& eeprom)
 {
 	eeprom.writeAny(bin);
 }
-void xPL_MacAddress::toArray(uint8_t* mac)
+void xPL_MacAddress::toArray(char* mac)
 {
 	memcpy(mac,bin,6);
 }
