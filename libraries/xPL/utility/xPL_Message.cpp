@@ -55,7 +55,10 @@ size_t xPL_Address::printTo(Print& p) const {
 
 	len += vendor.printlnNzTo(p,'-');
 	len += device.printlnNzTo(p,'.');
-	len += instance.printTo(p);
+	if (instance.len())
+		len += instance.printTo(p);
+	else
+		len += p.print('*');
 	
 	return len;
 }

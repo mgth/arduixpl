@@ -91,7 +91,7 @@ protected:
 	virtual const __FlashStringHelper* msgType() const { return _msgType; }	virtual const __FlashStringHelper* schClass() const { return _schClass; }	virtual const __FlashStringHelper* schType() const { return _schType; }
 	virtual size_t printContentTo(Print& p) const
 	{
-		size_t len;
+		size_t len=0;
 		xPL_Node* n = const_cast<xPL_Node*>(&_keys)->child();
 		while (n)
 		{
@@ -101,7 +101,7 @@ protected:
 		}
 		return len;
 	}
-	virtual size_t printTargetTo(Print& p) const { return _target.printTo(p); }
+	virtual size_t printTargetTo(Print& p) const { return _target.printTo(p);}
 };
 
 class xPL_MessageIn {
