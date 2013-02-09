@@ -48,8 +48,8 @@ public:
 
 	byte initialize ();
 	void initSPI ();
-	void enableBroadcast ();
-	void disableBroadcast ();
+	void filterXpl();
+	void filterXplCmnd();
 
 	word packetReceive();
 	void packetRelease();

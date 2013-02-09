@@ -24,6 +24,15 @@
 #include "xPL_ENC28J60.h"
 #include "../xPL/utility/xPL_Debug.h"
 
+//ERXFCON 0b01110000
+//EMPOH:EPMOL = 0
+//24h=0F:19
+//2Ah=78:70:2B:6C
+//32h=0A:7B:0A
+
+//00:00:00:00:0C:3B:38
+//<<388F
+
 xPL_ENC28J60 xplAdapter;
 
 VSHelperENC28J60 VSHelperENC28J60::helper;
@@ -80,7 +89,7 @@ static byte Enc28j60Bank;
 #define EPMM6            (0x0E|0x20)
 #define EPMM7            (0x0F|0x20)
 #define EPMCS           (0x10|0x20)
-// #define EPMO            (0x14|0x20)
+#define EPMO            (0x14|0x20)
 #define EWOLIE           (0x16|0x20)
 #define EWOLIR           (0x17|0x20)
 #define ERXFCON          (0x18|0x20)
@@ -409,9 +418,13 @@ static void writePhy (byte address, word data) {
     writeReg(ERXND, RXSTOP_INIT);
     writeReg(ETXST, TXSTART_INIT);
     writeReg(ETXND, TXSTOP_INIT);
-    enableBroadcast(); // change to add ERXFCON_BCEN recommended by epam
-    writeReg(EPMM0, 0x303f);
-    writeReg(EPMCS, 0xf7f9);
+    //enableBroadcast(); // change to add ERXFCON_BCEN recommended by epam
+
+	filterXplCmnd();
+
+
+//    writeReg(EPMM0, 0x303f);
+//    writeReg(EPMCS, 0xf7f9);
     writeRegByte(MACON1, MACON1_MARXEN|MACON1_TXPAUS|MACON1_RXPAUS);
     writeRegByte(MACON2, 0x00);
     writeOp(ENC28J60_BIT_FIELD_SET, MACON3,
@@ -457,15 +470,29 @@ static void writePhy (byte address, word data) {
     bitSet(SPSR, SPI2X);
 }
 
-void xPL_ENC28J60::enableBroadcast () {
-    writeRegByte(ERXFCON, ERXFCON_UCEN|ERXFCON_CRCEN|ERXFCON_PMEN|ERXFCON_BCEN);
+void xPL_ENC28J60::filterXpl () {
+	writeRegByte(ERXFCON, ERXFCON_ANDOR|ERXFCON_CRCEN|ERXFCON_PMEN);
+//	writeReg(EPMO, 0x0000);
+	writeReg(EPMM0, 0x3000); // 0C = 08:00 = IP
+	writeReg(EPMM2, 0x0080); // 17 = 11    = UDP
+	writeReg(EPMM4, 0x3C30); // 24 = 0F:19       = Port xPL 
+							 // 2A = 78:70:6C:2D = "xpl-"
+	writeReg(EPMM6, 0x001C); // 32 = 0A:7B:0A    = "/n{/n"*/
+
+    writeReg(EPMCS, 0xB4F7);
 }
 
-void xPL_ENC28J60::disableBroadcast () {
-    writeRegByte(ERXFCON, ERXFCON_UCEN|ERXFCON_CRCEN|ERXFCON_PMEN);
+void xPL_ENC28J60::filterXplCmnd () {
+	writeRegByte(ERXFCON, ERXFCON_ANDOR|ERXFCON_CRCEN|ERXFCON_PMEN);
+//	writeReg(EPMO, 0x0000);
+	writeReg(EPMM0, 0x3000); // 0C = 08:00 = IP
+	writeReg(EPMM2, 0x0080); // 17 = 11    = UDP
+	writeReg(EPMM4, 0xFC30); // 24 = 0F:19       = Port xPL 
+							 // 2A = 78:70:6C:2D:63:6D = "xpl-cm"
+	writeReg(EPMM6, 0x001F); // 32 = 6E:64:0A:7B:0A    = "nd/n{/n"*/
+
+    writeReg(EPMCS, 0xE325);
 }
-
-
 
 
 bool xPL_ENC28J60::begin()
@@ -478,7 +505,7 @@ bool xPL_ENC28J60::begin()
 	//   Stash::initMap(56);
 	initialize();
 
-	enableBroadcast();
+//	enableBroadcast();
 
 	return true;
 }
@@ -658,7 +685,7 @@ void xPL_ENC28J60::loop()
 
 	word receiveLen = packetReceive();
 	if (!receiveLen) { return; }
-
+	DBG(F("<ENC28J60 ???>"),receiveLen);
 
 	drop(23); 
 
