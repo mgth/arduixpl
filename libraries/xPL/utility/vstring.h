@@ -208,7 +208,7 @@ class VString
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
 	VString & operator = (VString &&rval);
 	#endif
-	 	bool like(const VString& s) { return ( s.charAt(0)=='*' || operator==(s) ); }	size_t count(char c) {		size_t n=0;		for(size_t i=0;i<_len;i++)			if (charAt(i)==c) n++;		return n;	}	 bool operator==(const VString& s) const;	 bool operator!=(const VString& s) const { return !operator==(s); }	 operator bool() { return _len!=0; }
+	 	bool like(const VString& s) { return ( s.charAt(0)=='*' || operator==(s) ); }	size_t count(char c) {		size_t n=0;		for(size_t i=0;i<_len;i++)			if (charAt(i)==c) n++;		return n;	}	 bool operator==(const VString& s) const;	 bool operator!=(const VString& s) const { return !operator==(s); }	 operator bool() const { return _len!=0; }
 
 	 ~VString() { destruct(); }
 

@@ -87,14 +87,17 @@ bool xPL_AdapterW5100::sendMessage(xPL_Message& msg)
 
 	if (connection()) 
 	{
-		//uint8_t ip[4]={ 0xFF, 0xFF, 0xFF, 0xFF};
-
+/* was a bad idea : http://xplproject.org.uk/forums/viewtopic.php?f=2&t=1202
 #ifdef XPL_IP
 		IPAddress ip;
-		for (byte i=0;i<4;i++) { ip[i]= (_ip.bin[i]&_mask.bin[i]) | (~_mask.bin[i]); } // TODO : maybe broadcast could be stored
+		for (byte i=0;i<4;i++) { ip[i]= _ip.bin[i] | (~_mask.bin[i]); }
 #else
 		IPAddress ip(255,255,255,255);
 #endif
+*/
+
+		IPAddress ip(255,255,255,255);
+
 		DBG(F("dest:"),ip);
 
 		_udp.beginPacket(ip, XPL_PORT);

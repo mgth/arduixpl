@@ -1,5 +1,5 @@
 /*
-  ArduixPL - xPL for arduino
+  ArduixPL - xPL library for Arduino(tm)
   Copyright (c) 2012/2013 Mathieu GRENET.  All right reserved.
 
   This file is part of ArduixPL.
@@ -17,11 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified Jan 20, 2013 by Mathieu GRENET 
+	  Modified 2013-2-19 by Mathieu GRENET 
 	  mailto:mathieu@mgth.fr
 	  http://www.mgth.fr
 */
-
 #ifndef xPL_ENC28J60_h
 #define xPL_ENC28J60_h
 

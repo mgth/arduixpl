@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with ArduixPL.  If not, see <http://www.gnu.org/licenses/>.
 
-	  Modified 2013-2-4 by Mathieu GRENET 
+	  Modified 2013-2-19 by Mathieu GRENET 
 	  mailto:mathieu@mgth.fr
 	  http://www.mgth.fr
 */
@@ -681,29 +681,32 @@ void xPL_ENC28J60::loop()
 {
 	if (!connection()) { return; }
 
-	size_t addr = gNextPacketPtr; 
+	size_t addr = gNextPacketPtr+13+35; 
 
 	word receiveLen = packetReceive();
 	if (!receiveLen) { return; }
-	DBG(F("<ENC28J60 ???>"),receiveLen);
 
-	drop(23); 
+//	drop(23); 
 
-	if ( readByte() == 0x11 ) // it is an UDP packet
-	{
-		drop(12);addr+=13;
+//	if ( readByte() == 0x11 ) // it is an UDP packet
+//	{
+//		drop(12);
+	
+//	addr+=13;
 		
-		word udp_port=readWordLE();
+//		word udp_port=readWordLE();
 
-		if (udp_port == XPL_PORT)
-		{
+//		if (udp_port == XPL_PORT)
+//		{
 			DBG(F("<ENC28J60 xPL>"),receiveLen);
 
-			VString s(addr + 35,receiveLen-42,VSHelperENC28J60::helper);
+
+
+			VString s(addr,receiveLen-42,VSHelperENC28J60::helper);
 			xPL_MessageIn msg(s);
 			xPL.parseMessage(msg);
-		}
-	}
+//		}
+//	}
 	packetRelease();
 }
 
